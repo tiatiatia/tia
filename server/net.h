@@ -15,6 +15,10 @@
 #define BACKLOG 100
 #define SERVERPORT "6969"
 
+using namespace std;
+
+bool VERBOSE = false;
+
 struct addrinfo hints, *res;
 int sockfd, newfd, status;
 struct sockaddr_storage them;
@@ -44,69 +48,77 @@ void makesocket()
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 	if((status=getaddrinfo( NULL, SERVERPORT, &hints, &res))!=0) {
-		fprintf(stderr, "Error: %s\n", gai_strerror(status));
+		if(VERBOSE) fprintf(stderr, "Error: %s\n", gai_strerror(status));
+		else fprintf(stdin, "Sorry, could not start server.");
 	bye(); exit(1); }
 	sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if(sockfd==-1) {
-		fprintf(stderr, "Error creating socket.\n");
+		if(VERBOSE) fprintf(stderr, "Error creating socket.\n");
+		else fprintf(stdin, "Sorry, could not start server.");
 	bye(); exit(1); }
 	int yes = 1;
 	if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int))==-1) {
-		perror("setsockopt\n");
+		if(VERBOSE) perror("setsockopt error\n");
+		else fprintf(stdin, "Sorry, could not start server.");
 		exit(1); }
 }
 
 void bindlisten()
 {
 	if((status=bind(sockfd, res->ai_addr, res->ai_addrlen))!=0) {
-		fprintf(stderr, "Error binding: %s.\n", gai_strerror(errno));
+		if(VERBOSE) fprintf(stderr, "Error binding: %s.\n", gai_strerror(errno));
+		else fprintf(stdin, "Sorry, could not start server.");
 	bye(); exit(1); }
 	if((status=listen(sockfd, BACKLOG))!=0) {
-		fprintf(stderr, "Error listening.\n");
+		if(VERBOSE) fprintf(stderr, "Error listening.\n");
+		else fprintf(stdin, "Sorry, could not start server.");
 	bye(); exit(1); }
-	printf("Waiting for connections...\n");
+	printf("Server successfully started. Waiting for connections...\n");
 }
 
 void acceptcon()
 {
 	newfd = accept(sockfd, (struct sockaddr*)&them, &((socklen_t)addr_size));
 	if(newfd==-1) {
-		fprintf(stderr, "Error accepting\n");
+		if(VERBOSE) fprintf(stderr, "Error accepting\n");
+		else fprintf(stdin, "Sorry, could not accept connection.");
 	bye(); exit(1); }
 	if( ((struct sockaddr*)&them)->sa_family==AF_INET)
 	{
 		inet_ntop(AF_INET, &(((struct sockaddr_in*)(&them))->sin_addr), ip4, INET_ADDRSTRLEN);
-		printf("Recieved ip4 connection from %s\n", ip4);
+		if(VERBOSE) printf("Recieved ip4 connection from %s\n", ip4);
 	} else {
 		inet_ntop(AF_INET6, &(((struct sockaddr_in6*)(&them))->sin6_addr), ip6, INET6_ADDRSTRLEN);
-		printf("Recieved ip6 connection from %s\n", ip6);
+		if(VERBOSE) printf("Recieved ip6 connection from %s\n", ip6);
 	}
 }
 
-char* getamsg()
+string getamsg()
 {
 	int bytes_got;
-	char inmsg[512];
+	char* inmsg;
 	bytes_got = recv(newfd, inmsg, sizeof inmsg, 0);
 //	clreol(stdin);
 	if(bytes_got==-1) {
-		fprintf(stderr, "Error: %s\n", strerror(errno));
+		if(VERBOSE) fprintf(stderr, "Error getting message: %s\n", strerror(errno));
+		else fprintf(stderr, "Error getting message.");
 	bye(); exit(1); }
 	inmsg[bytes_got] = '\0';
-	printf("%s",inmsg);
-	printf("Printed %d of %d bytes.\n", (int)strlen(inmsg), bytes_got);
-	return inmsg;
+	if(VERBOSE) printf("Printing %d of %d bytes.\n", (int)strlen(inmsg), bytes_got);
+	string returnstring(inmsg);
+	return returnstring;
 }
 
-void sendamsg(char *outmsg)
+void sendamsg(string inputstring)
 {
 	int len, bytes_sent;
+	const char* outmsg = inputstring.c_str();
 	len = strlen(outmsg);
 	bytes_sent=send(newfd, outmsg, len, 0);
 	if(bytes_sent==-1) {
-		fprintf(stderr, "Error sending.\n");
+		if(VERBOSE) fprintf(stderr, "Error sending.\n");
 	bye(); exit(1); }
-	printf("Sent %d of %d bytes.\n", bytes_sent, len);
+	if(VERBOSE) printf("Sent %d of %d bytes.\n", bytes_sent, len);
 }
 
 void sigaction() {
@@ -115,6 +127,6 @@ void sigaction() {
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_RESTART;
 	if(sigaction(SIGCHLD, &sa, NULL) == -1) {
-		perror("sigaction error\n");
+		if(VERBOSE) perror("sigaction error\n");
 		exit(1); }
 }

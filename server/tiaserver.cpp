@@ -6,24 +6,35 @@
 
 using namespace std;
 
-int main() {
+int communicate() {
 	makesocket();
 	bindlisten();
 	sigaction();
-	
+		
 	while(1) {
 		acceptcon();
 
 		if(!fork()) {
-			closesockfd();
-			char* message = getamsg();
+			close(sockfd);
+			string message = getamsg();
 			cout << message << endl;
-			closenewfd();
+			string line;
+			getline(cin, line);
+			sendamsg(line);
+			close(newfd);
 			exit(0);
 		}
-		closenewfd();
+		close(newfd);
 	}
 	
 	bye();
+	return 0;
+}
+
+int main(int args, char* argv[]) {
+	if(args==2) {
+		if(argv[1]=="-v") VERBOSE = true;	
+	}	
+	communicate();
 	return 0;
 }
