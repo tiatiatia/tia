@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include "net.h"
+#include "tiautil.h"
 
 using namespace std;
 
@@ -31,9 +32,14 @@ int communicate() {
 	return 0;
 }
 
-int main(int args, char* argv[]) {
-	if(args==2) {
-		if(argv[1]=="-v") VERBOSE = true;	
+int main(int argc, const char *argv[]) {
+	if(argc==2) {
+		string argstring = argv[1];
+		if(argstring.find("-v")!= string::npos) 
+		{
+		VERBOSE = true;
+		cout << "Verbose mode initiated" << endl;
+		}
 	}	
 	communicate();
 	return 0;

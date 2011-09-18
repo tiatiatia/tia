@@ -12,7 +12,7 @@
 #include <errno.h>
 #define SERVERPORT "6969"
 #define CLIENTPORT "9696"
-#define SERVERIP "140.103.108.188"
+#define SERVERIP "127.0.0.1"
 
 using namespace std;
 
@@ -58,11 +58,11 @@ void connectto() // Open the connection
 	{       
 		inet_ntop(AF_INET, &(((struct sockaddr_in*)res->ai_addr)->sin_addr), ip4con, INET_ADDRSTRLEN);
 		portnumcon = ntohs( ((struct sockaddr_in*)res->ai_addr)->sin_port );
-		if(VERBOSE) printf("Connecting to %s:%d...\n",ip4con,portnumcon);
+		if(VERBOSE) printf("Connecting to %s:%d in ipv4...\n",ip4con,portnumcon);
 	} else {
 		inet_ntop(AF_INET6, &(((struct sockaddr_in6*)res->ai_addr)->sin6_addr), ip6con, INET6_ADDRSTRLEN);
 		portnumcon = ntohs( ((struct sockaddr_in6*)res->ai_addr)->sin6_port );
-		if(VERBOSE) printf("Connecting to %s:%d...\n",ip6con,portnumcon);
+		if(VERBOSE) printf("Connecting to %s:%d in ipv6...\n",ip6con,portnumcon);
 	}
 	
 	if((status=connect(sockfd, res->ai_addr, res->ai_addrlen))!=0) {
@@ -116,6 +116,7 @@ void sendamsg(string inputstring)
 				else printf("Error connecting to the TIA server.\n");
 	bye(); exit(1); }
 	if(VERBOSE) printf("Sent %d of %d bytes.\n", bytes_sent, len);
+	bye();
 
 }
 
