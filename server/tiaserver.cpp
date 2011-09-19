@@ -1,6 +1,8 @@
 // tiaserver.cpp is the main file for running the tia server
 
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <vector>
 #include "net.h"
 #include "tiautil.h"
@@ -8,20 +10,22 @@
 using namespace std;
 
 int communicate() {
-	makesocket();
-	bindlisten();
-	sigaction();
-		
+	startServer();
+	
 	while(1) {
 		acceptcon();
 
 		if(!fork()) {
-			close(sockfd);
+			close(sockfd); // child process doesn't need the original socket
 			string message = getamsg();
 			cout << message << endl;
-			string line;
+			stringstream ss;
+			ss << message;
+			string signal;
+			message >> signal;
+			/*string line;
 			getline(cin, line);
-			sendamsg(line);
+			sendamsg(line);*/
 			close(newfd);
 			exit(0);
 		}
