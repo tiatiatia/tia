@@ -106,7 +106,7 @@ void acceptcon()
 string getamsg()
 {
 	int bytes_got;
-	char inmsg[10000];
+	char inmsg[4096];
 	string returnstring;
 	bytes_got = recv(newfd, inmsg, sizeof inmsg, 0);
 	while(bytes_got > 0)
@@ -114,9 +114,10 @@ string getamsg()
 //		clreol(stdin);
 		inmsg[bytes_got] = '\0';
 		returnstring += (char*)inmsg;
-		if(VERBOSE) printf("Printing %d of %d bytes.\n", (int)strlen(inmsg), bytes_got);
+		if(VERBOSE) printf("Receiving %d of %d bytes.\n", (int)strlen(inmsg), bytes_got);
 		bytes_got = recv(newfd, inmsg, sizeof inmsg, 0);
 	}
+	
 	if(bytes_got==-1) {
 		if(VERBOSE) fprintf(stderr, "Error getting message: %s\n", strerror(errno));
 		else fprintf(stderr, "Error getting message.");
