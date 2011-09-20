@@ -23,14 +23,14 @@ Finally, call bye() to close sockets.
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <errno.h>
-#include "tiautil.h"
+//#include "tiautil.h"
 #define SERVERPORT "6969"
 #define CLIENTPORT "9696"
 #define SERVERIP "127.0.0.1"
 
 using namespace std;
 
-//bool VERBOSE = false;
+bool VERBOSE = false;
 
 struct addrinfo hints, *res;
 int sockfd, status;
@@ -42,7 +42,7 @@ int portnum;
 int sizesa = sizeof(struct sockaddr_storage);
 char ip4[INET_ADDRSTRLEN];
 char ip6[INET6_ADDRSTRLEN];
-char inmsg[10000];
+char inmsg[512];
 
 void bye() // Things to handle when trying to exit
 {
@@ -135,8 +135,8 @@ string getamsg()
 {
 	int bytes_got;
 	bytes_got = recv(sockfd, inmsg, sizeof inmsg, 0);
-	char ch;
-	while ((ch = getchar()) != '\n' && ch != EOF);
+	//char ch;
+	//while ((ch = getchar()) != '\n' && ch != EOF);
 
 	if(bytes_got==-1) {
 		if(VERBOSE) fprintf(stderr, "Error: %s\n", strerror(errno));
