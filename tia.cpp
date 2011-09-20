@@ -2,10 +2,13 @@
 
 #include <iostream>
 #include <vector>
-#include "net.h"
 #include "tiautil.h"
+#include "net.h"
 
 using namespace std;
+
+string SHAREPATH;
+
 
 void syncWithTIA() {
 	string fileinfo = listdir(SHAREPATH.c_str()); // find what's in SHAREPATH
@@ -14,13 +17,13 @@ void syncWithTIA() {
 
 int communicate () {
 	connectToTIA();
-	/*string msg;
+	string msg;
 	getline(cin,msg);
-	sendamsg(msg);*/
-	syncWithTIA();
+	sendamsg(msg);
+	//syncWithTIA();
 	
-	//string s = getamsg();
-	//cout << s << endl;
+	string s = getamsg();
+	cout << s << endl;
 
 	bye();
 	return 0;
@@ -28,7 +31,6 @@ int communicate () {
 
 int main(int argc, char* argv[]) {
 	VERBOSE = false;
-	DOESSPENCERSUCK = true;
 	if(argc==2) {
 		string argstring = argv[1];
 		if(argstring.find("-v")!= string::npos) 

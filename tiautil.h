@@ -7,10 +7,8 @@ using namespace std;
 
 /************** GLOBALS *********************/
 
-extern string SHAREPATH; // local directory with which the client shares
+//extern string SHAREPATH; // local directory with which the client shares
 extern bool VERBOSE;	// Whether or not to output verbose info
-extern bool DOESSPENCERSUCK; // Whether or not Spencer sucks
-
 
 /************** FUNCTIONS *******************/
 

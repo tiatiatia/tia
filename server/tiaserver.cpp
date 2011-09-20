@@ -19,13 +19,13 @@ int communicate() {
 			close(sockfd); // child process doesn't need the original socket
 			string message = getamsg();
 			cout << message << endl;
-			stringstream ss;
+			/*stringstream ss;
 			ss << message;
 			string signal;
-			message >> signal;
-			/*string line;
+			message >> signal; */
+			string line;
 			getline(cin, line);
-			sendamsg(line);*/
+			sendamsg(line);
 			close(newfd);
 			exit(0);
 		}
