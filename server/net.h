@@ -35,6 +35,7 @@ struct sockaddr_storage them;
 int addr_size = sizeof them;
 char ip4[INET_ADDRSTRLEN];
 char ip6[INET6_ADDRSTRLEN];
+char *truaddr;
 
 void closesockfd() { close(sockfd); }
 void closenewfd() { close(newfd); }
@@ -97,9 +98,11 @@ void acceptcon()
 	{
 		inet_ntop(AF_INET, &(((struct sockaddr_in*)(&them))->sin_addr), ip4, INET_ADDRSTRLEN);
 		if(VERBOSE) printf("Recieved ip4 connection from %s\n", ip4);
+		truaddr = ip4;
 	} else {
 		inet_ntop(AF_INET6, &(((struct sockaddr_in6*)(&them))->sin6_addr), ip6, INET6_ADDRSTRLEN);
 		if(VERBOSE) printf("Recieved ip6 connection from %s\n", ip6);
+		truaddr = ip6;
 	}
 }
 
@@ -136,7 +139,11 @@ void sendamsg(string inputstring)
 	bye(); exit(1); }
 	if(VERBOSE) printf("Sent %d of %d bytes.\n", bytes_sent, len);
 }
-
+string getIpAddr()
+{
+	if(truaddr == (char*)&ip4) return ip4;
+	else return ip6;
+}
 void sigaction() {
 	struct sigaction sa;
 	sa.sa_handler = sigchld_handler;

@@ -113,8 +113,4 @@ void writeString(string content, string name){
 		{
 			cerr << "File operation on file" << name <<" failed: " << e.what() << endl;
 		}
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 649d6bec1d43ae1e4df8d5de99b4542428e748e1

@@ -18,12 +18,30 @@ int communicate() {
 		if(!fork()) {
 			close(sockfd); // child process doesn't need the original socket
 			string message = getamsg();
+<<<<<<< HEAD
 			cout << message << endl;
 			/*stringstream ss;
 			ss << message;
 			string signal;
 			message >> signal; */
 			string line;
+=======
+			stringstream messageholder;
+			messageholder << message;
+			string messageheader;
+			getline(messageholder,messageheader);
+			if (messageheader.find("bacon")!= string::npos)
+			{
+				string ipaddress = getIpAddr();
+				string datavalues = messageholder.str();
+				writeString(datavalues,"./Addresses/" + ipaddress); 
+			}
+			//stringstream ss;
+			//ss << message;
+			//string signal;
+			//message >> signal;
+			/*string line;
+>>>>>>> f1bda7b1bea46385b03d6f723ec954f3112f144b
 			getline(cin, line);
 			sendamsg(line);
 			close(newfd);

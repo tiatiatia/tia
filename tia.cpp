@@ -17,13 +17,13 @@ void syncWithTIA() {
 
 int communicate () {
 	connectToTIA();
-	string msg;
+	/*string msg;
 	getline(cin,msg);
-	sendamsg(msg);
-	//syncWithTIA();
+	sendamsg(msg);*/
+	syncWithTIA();
 	
-	string s = getamsg();
-	cout << s << endl;
+	//string s = getamsg();
+	//cout << s << endl;
 
 	bye();
 	return 0;

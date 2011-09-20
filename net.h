@@ -26,7 +26,7 @@ Finally, call bye() to close sockets.
 //#include "tiautil.h"
 #define SERVERPORT "6969"
 #define CLIENTPORT "9696"
-#define SERVERIP "127.0.0.1"
+#define SERVERIP "140.103.108.188"
 
 using namespace std;
 
