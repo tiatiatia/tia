@@ -1,10 +1,20 @@
 // server's net.h
 
+/**********************************************
+How to use this file:
+startServer(); prepares the machine's 6969 port
+for receiving connections.
+acceptcon(); accepts a new connection.
+getamsg() waits for a message, returns it as a string
+sendamsg(string msg) sends a message to the client connected
+bye(); cleans up by closing the sockets
+**********************************************/
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>			// HOST	 ({})
+#include <sys/socket.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
@@ -96,7 +106,7 @@ void acceptcon()
 string getamsg()
 {
 	int bytes_got;
-	char inmsg[512];
+	char inmsg[10000];
 	string returnstring;
 	bytes_got = recv(newfd, inmsg, sizeof inmsg, 0);
 	while(bytes_got > 0)
@@ -135,3 +145,11 @@ void sigaction() {
 		if(VERBOSE) perror("sigaction error\n");
 		exit(1); }
 }
+
+// Initializes the server as needed
+void startServer() {
+	makesocket();
+	bindlisten();
+	sigaction();
+}
+

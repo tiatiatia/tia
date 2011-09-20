@@ -5,7 +5,14 @@
 #include <dirent.h>
 using namespace std;
 
-extern bool VERBOSE;
+/************** GLOBALS *********************/
+
+extern string SHAREPATH; // local directory with which the client shares
+extern bool VERBOSE;	// Whether or not to output verbose info
+extern bool DOESSPENCERSUCK; // Whether or not Spencer sucks
+
+
+/************** FUNCTIONS *******************/
 
 string listdir(const char *path) {
 // Takes in a directory name and returns

@@ -1,1 +1,1 @@
-g++ -o tia tia.cpp net.h dirfunc.cpp
+g++ -o tia tia.cpp net.h tiautil.h

@@ -7,32 +7,37 @@
 
 using namespace std;
 
+void syncWithTIA() {
+	string fileinfo = listdir(SHAREPATH.c_str()); // find what's in SHAREPATH
+	sendamsg(fileinfo); // send file info to TIA server
+}
+
 int communicate () {
-	makesocket();
-	connectto();
-	//char msg[512];
-	//fgets(msg,sizeof msg, stdin);
-	string msg;
+	connectToTIA();
+	/*string msg;
 	getline(cin,msg);
-	sendamsg(msg);
-	makesocket();
-	connectto();
-	string s = getamsg();
-	cout << s << endl;
+	sendamsg(msg);*/
+	syncWithTIA();
+	
+	//string s = getamsg();
+	//cout << s << endl;
 
 	bye();
 	return 0;
 }
 
 int main(int argc, char* argv[]) {
+	VERBOSE = false;
+	DOESSPENCERSUCK = true;
 	if(argc==2) {
 		string argstring = argv[1];
 		if(argstring.find("-v")!= string::npos) 
 		{
-		VERBOSE = true;
-		cout << "Verbose mode initiated" << endl;
+			VERBOSE = true;
+			cout << "Verbose mode initiated" << endl;
 		}
 	}
-	communicate();
+	SHAREPATH = "./share/"; // initialize the sharing path to ./share/
+	communicate(); // begin main communication
 	return 0;
 }
