@@ -152,6 +152,7 @@ string getamsg()
 // Sends a message to the connected machine, taking the string as a parameter
 void sendamsg(string inputstring)
 {
+	inputstring+='\r';
 	int len, bytes_sent;
 	const char* outmsg = inputstring.c_str();
 	len = strlen(outmsg);
