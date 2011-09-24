@@ -26,7 +26,8 @@ Finally, call bye() to close sockets.
 //#include "tiautil.h"
 #define SERVERPORT "6969"
 #define CLIENTPORT "9696"
-#define SERVERIP "127.0.0.1"
+//#define SERVERIP "127.0.0.1"
+#define SERVERIP "140.103.108.188"
 
 using namespace std;
 
@@ -134,7 +135,13 @@ void connectToClient(string clientIP) {
 string getamsg()
 {
 	int bytes_got;
+	string returnstring;
 	bytes_got = recv(sockfd, inmsg, sizeof inmsg, 0);
+	while(bytes_got>0) {
+		inmsg[bytes_got] = '\0';
+		returnstring += (char*)inmsg;
+		bytes_got = recv(sockfd, inmsg, sizeof inmsg, 0);
+	}
 	//char ch;
 	//while ((ch = getchar()) != '\n' && ch != EOF);
 
@@ -142,15 +149,16 @@ string getamsg()
 		if(VERBOSE) fprintf(stderr, "Error: %s\n", strerror(errno));
 		else printf("Error connecting to the TIA server.\n");
 	bye(); exit(1); }
-	inmsg[bytes_got] = '\0';
-	if(VERBOSE) printf("Printing %d of %d bytes.\n", (int)strlen(inmsg), bytes_got);
-	string returnstring(inmsg);
+	//inmsg[bytes_got] = '\0';
+	//if(VERBOSE) printf("Printing %d of %d bytes.\n", (int)strlen(inmsg), bytes_got);
+	//string returnstring(inmsg);
 	return returnstring;
 }
 
 // Sends a message to the connected machine, taking the string as a parameter
 void sendamsg(string inputstring)
 {
+	inputstring+='\r';
 	int len, bytes_sent;
 	const char* outmsg = inputstring.c_str();
 	len = strlen(outmsg);
