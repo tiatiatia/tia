@@ -110,14 +110,23 @@ string getamsg()
 {
 	int bytes_got;
 	char inmsg[4096];
+	bool endmsg=false;
 	string returnstring;
 	bytes_got = recv(newfd, inmsg, sizeof inmsg, 0);
 	while(bytes_got > 0)
 	{
-//		clreol(stdin);
+		if (inmsg[bytes_got-1] == '\r')
+		{
+			endmsg = true;
+			inmsg[bytes_got-1]='\0';
+		}
+		else
+		{
 		inmsg[bytes_got] = '\0';
+		}
 		returnstring += (char*)inmsg;
 		if(VERBOSE) printf("Receiving %d of %d bytes.\n", (int)strlen(inmsg), bytes_got);
+		if (endmsg) break;
 		bytes_got = recv(newfd, inmsg, sizeof inmsg, 0);
 	}
 	
