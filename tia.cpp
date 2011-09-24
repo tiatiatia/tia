@@ -20,6 +20,12 @@ int syncWithTIA() {
 	return 0;
 }
 
+void getFromClient(string ip, string filetoget)
+{
+	connectToClient(ip);
+	sendamsg(filetoget);
+	getafile();
+}
 /* request() is a function that takes in a user entered
 string, sends "cheese" (sentinal value indicating a request)
 followed by the query to the TIA server, and receives the results.
@@ -50,7 +56,7 @@ void request(string query) {
 	int fileToGet; // read in which one they'd like to download
 	cin >> fileToGet;
 	cout << "Attempting to get the file " << Filenames[fileToGet-1] << " from " << IPs[fileToGet-1] << endl;
-	//getFromClient(IPs[fileToGet-1], Filenames[fileToGet-1]);
+	getFromClient(IPs[fileToGet-1], Filenames[fileToGet-1]);
 }
  
 int main(int argc, char* argv[]) {

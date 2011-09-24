@@ -57,7 +57,7 @@ string searchFiles(string searchstr)
 // (these characters are assumed to be ".txt")
 // the filename is assumed to be an IP address and the lines in the files
 // are assumed to be file names, so the return value should be 
-// alternating IP address and file names
+// alternating file names and IP address
 	searchstr = stripCaps(searchstr);
 	fstream searchfile;
 	stringstream filelist;
@@ -80,7 +80,7 @@ string searchFiles(string searchstr)
 				listing = stripCaps(listing); 
 				if ( listing.find(searchstr.c_str()) != string::npos)
 				{ // found a match
-				if (VERBOSE) cout << "Found match at "<< filename << "in file " << listing << endl;
+				if (VERBOSE) cout << "Found match at "<< listing << "in file " << filename << endl;
 					searchresults+=filename + '\n' + 
 					listing + '\n';
 				}

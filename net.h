@@ -14,6 +14,8 @@ Finally, call bye() to close sockets.
 
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,6 +29,7 @@ Finally, call bye() to close sockets.
 #define SERVERPORT "6969"
 #define CLIENTPORT "9696"
 #define SERVERIP "140.103.108.188"
+#define FOLDERNAME "./share/"
 //#define SERVERIP "127.0.0.1"
 
 using namespace std;
@@ -178,5 +181,76 @@ void sendamsg(string inputstring)
 				else printf("Error connecting to the TIA server.\n");
 	bye(); exit(1); }
 	if(VERBOSE) printf("Sent %d of %d bytes.\n", bytes_sent, len);
+}
+void getafile()
+{
+	sstream heraldreader;
+	string herald = getamsg();
+	long filesize;
+	string filename;
+	fstream filewriter;
+	int bytes_got;
+	heraldreader << herald;
+	getline(heraldreader, filename);
+	heraldreader >> filesize;
+	filename = FOLDERNAME + filename;
+	if (VERBOSE) cout << "attempting to write " << filesize << "bytes \
+	to " << filename << "..." << endl;
+	try
+	{
+		filewriter.open(filename.c_str(), ios_base::out);
+		while (filesize > 0)
+		{
+			bytes_got = recv(newfd, inmsg, sizeof inmsg, 0);
+			filesize -= bytes_got;
+			filewriter.write(inmsg, bytes_got);
+		}
+		filewriter.close();
+		if (VERBOSE) cout << "successfully received file" << endl;
+	}
+	catch (exception e)
+	{
+	cerr << "error writing file: " << e.what() << endl;
+	}
+}
+void sendafile(string filename)
+{
+	trufilename = FOLDERNAME + filename;
+	fstream filereader;
+	long filesize;
+	FILE * sFile;
+	char outmsg[4096];
+	int bytes_read;
+	try
+	{
+		if (VERBOSE) cout << "attempting to send the file " << trufilename \
+		<< "..." <<< endl;
+		sFile = fopen(filename.c_str(),"r");
+		fseek(sFile,0,SEEK_END);
+		filesize = ftell(sFile);
+		fclose(sFile);
+		if (VERBOSE) cout << trufilename << " is " << filesize << " bytes long" \
+		<< endl;
+		sendamsg(filename + '\n' + filesize + '\n');
+		filereader.open(filename.c_str(), ios_base::in);
+		while (filesize > 0)
+		{
+			bytes_read = filereader.get(outmsg, sizeof outmsg);
+			filesize -= bytes_read;
+			outmsg[bytes_read] = '\0';
+			len = strlen(outmsg);
+			bytes_sent=send(newfd, outmsg, len, 0);
+			if(bytes_sent==-1) {
+			if(VERBOSE) fprintf(stderr, "Error sending.\n");
+			bye(); exit(1); }
+			if(VERBOSE) printf("Sent %d of %d bytes.\n", bytes_sent, len);
+		}
+		if (VERBOSE) cout << "File " << trufilename << " successfully sent" << endl;
+		
+	}
+	catch(exception e)
+	{
+	cerr << "error sending or reading file: " << e.what() << endl;
+	}
 }
 
