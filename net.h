@@ -286,7 +286,7 @@ void sendafile(string filename)
 		while (filesize > 0)
 		{
 			filereader.get(outmsg, sizeof outmsg);
-			bytes_read = (int)filereader.gcount();
+			bytes_read = filereader.gcount();
 			filesize -= bytes_read;
 			bytes_sent=send(sockfd, outmsg, bytes_read, 0);
 			if(bytes_sent==-1) {
