@@ -288,13 +288,11 @@ void sendafile(string filename)
 			filereader.get(outmsg, sizeof outmsg);
 			bytes_read = (int)filereader.gcount();
 			filesize -= bytes_read;
-			outmsg[bytes_read] = '\0';
-			len = strlen(outmsg);
-			bytes_sent=send(sockfd, outmsg, len, 0);
+			bytes_sent=send(sockfd, outmsg, bytes_read, 0);
 			if(bytes_sent==-1) {
 			if(VERBOSE) fprintf(stderr, "Error sending.\n");
 			bye(); exit(1); }
-			if(VERBOSE) printf("Sent %d of %d bytes.\n", bytes_sent, len);
+			if(VERBOSE) printf("Sent %d of %d bytes.\n", bytes_sent, bytes_read);
 		}
 		if (VERBOSE) cout << "File " << trufilename << " successfully sent" << endl;
 		
