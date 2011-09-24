@@ -43,7 +43,7 @@ int portnum;
 int sizesa = sizeof(struct sockaddr_storage);
 char ip4[INET_ADDRSTRLEN];
 char ip6[INET6_ADDRSTRLEN];
-char inmsg[512];
+char inmsg[4096];
 
 void bye() // Things to handle when trying to exit
 {
@@ -138,9 +138,19 @@ string getamsg()
 	string returnstring;
 	bytes_got = recv(sockfd, inmsg, sizeof inmsg, 0);
 	while(bytes_got>0) {
+		if (inmsg[bytes_got-1] == '\r')
+		{
+			endmsg = true;
+			inmsg[bytes_got-1]='\0';
+		}
+		else
+		{
 		inmsg[bytes_got] = '\0';
+		}
 		returnstring += (char*)inmsg;
-		bytes_got = recv(sockfd, inmsg, sizeof inmsg, 0);
+		if(VERBOSE) printf("Receiving %d of %d bytes.\n", (int)strlen(inmsg), bytes_got);
+		if (endmsg) break;
+		bytes_got = recv(newfd, inmsg, sizeof inmsg, 0);
 	}
 	//char ch;
 	//while ((ch = getchar()) != '\n' && ch != EOF);
