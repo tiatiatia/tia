@@ -22,11 +22,19 @@ int communicate() {
 			messageholder << message;
 			string messageheader;
 			getline(messageholder,messageheader);
+			cout << messageheader;
 			if (messageheader.find("bacon")!= string::npos)
 			{
 				string ipaddress = getIpAddr();
 				string datavalues = messageholder.str();
 				writeString(datavalues,"./Addresses/" + ipaddress); 
+			}
+			if (messageheader.find("cheese")!=string::npos)
+			{
+				string searchstr;
+				getline(messageholder, searchstr);
+				string searchresults = searchFiles(searchstr);
+				sendamsg(searchresults);
 			}
 			close(newfd);
 			exit(0);
