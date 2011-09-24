@@ -290,7 +290,7 @@ void sendafile(string filename)
 			filesize -= bytes_read;
 			outmsg[bytes_read] = '\0';
 			len = strlen(outmsg);
-			bytes_sent=send(sockfd, outmsg, sizeof outmsg, 0);
+			bytes_sent=send(sockfd, outmsg, len, 0);
 			if(bytes_sent==-1) {
 			if(VERBOSE) fprintf(stderr, "Error sending.\n");
 			bye(); exit(1); }
