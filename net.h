@@ -135,7 +135,13 @@ void connectToClient(string clientIP) {
 string getamsg()
 {
 	int bytes_got;
+	string returnstring;
 	bytes_got = recv(sockfd, inmsg, sizeof inmsg, 0);
+	while(bytes_got>0) {
+		inmsg[bytes_got] = '\0';
+		returnstring += (char*)inmsg;
+		bytes_got = recv(sockfd, inmsg, sizeof inmsg, 0);
+	}
 	//char ch;
 	//while ((ch = getchar()) != '\n' && ch != EOF);
 
@@ -143,9 +149,9 @@ string getamsg()
 		if(VERBOSE) fprintf(stderr, "Error: %s\n", strerror(errno));
 		else printf("Error connecting to the TIA server.\n");
 	bye(); exit(1); }
-	inmsg[bytes_got] = '\0';
-	if(VERBOSE) printf("Printing %d of %d bytes.\n", (int)strlen(inmsg), bytes_got);
-	string returnstring(inmsg);
+	//inmsg[bytes_got] = '\0';
+	//if(VERBOSE) printf("Printing %d of %d bytes.\n", (int)strlen(inmsg), bytes_got);
+	//string returnstring(inmsg);
 	return returnstring;
 }
 
