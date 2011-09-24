@@ -285,7 +285,7 @@ void sendafile(string filename)
 		filereader.open(trufilename.c_str(), ios_base::in);
 		while (filesize > 0)
 		{
-			filereader.get(outmsg, sizeof outmsg);
+			filereader.get(outmsg, sizeof outmsg, NULL);
 			bytes_read = filereader.gcount();
 			filesize -= bytes_read;
 			bytes_sent=send(sockfd, outmsg, bytes_read, 0);
