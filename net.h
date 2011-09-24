@@ -14,8 +14,6 @@ Finally, call bye() to close sockets.
 
 
 #include <iostream>
-#include <fstream>
-#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,7 +29,6 @@ Finally, call bye() to close sockets.
 #define SERVERPORT "6969"
 #define CLIENTPORT "9696"
 #define SERVERIP "140.103.108.188"
-#define FOLDERNAME "./share/"
 //#define SERVERIP "127.0.0.1"
 #define BACKLOG 100
 
@@ -69,7 +66,8 @@ void makeTIAsocket(string ip) // Create the socket, refered to by sockfd. Pass a
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
-	string port = ip == SERVERIP ? SERVERPORT : CLIENTPORT;
+	//string port = ip == SERVERIP ? SERVERPORT : CLIENTPORT;
+	string port = "9696";
 	if((status=getaddrinfo(ip.c_str(), port.c_str(), &hints, &res))!=0) {
 		if(VERBOSE) fprintf(stderr, "Error getting addrinfo: %s\n", gai_strerror(status));
 		else fprintf(stderr, "Could not connect to the TIA server.\n");
@@ -226,82 +224,6 @@ void sendamsg(string inputstring)
 				else printf("Error connecting to the TIA server.\n");
 	bye(); exit(1); }
 	if(VERBOSE) printf("Sent %d of %d bytes.\n", bytes_sent, len);
-}
-void getafile()
-{
-	stringstream heraldreader;
-	string herald = getamsg();
-	long filesize;
-	string filename;
-	fstream filewriter;
-	int bytes_got;
-	heraldreader << herald;
-	getline(heraldreader, filename);
-	heraldreader >> filesize;
-	filename = FOLDERNAME + filename;
-	if (VERBOSE) cout << "attempting to write " << filesize << "bytes \
-	to " << filename << "..." << endl;
-	try
-	{
-		filewriter.open(filename.c_str(), ios_base::out);
-		while (filesize > 0)
-		{
-			bytes_got = recv(newfd, inmsg, sizeof inmsg, 0);
-			filesize -= bytes_got;
-			filewriter.write(inmsg, bytes_got);
-		}
-		filewriter.close();
-		if (VERBOSE) cout << "successfully received file" << endl;
-	}
-	catch (exception e)
-	{
-	cerr << "error writing file: " << e.what() << endl;
-	}
-}
-void sendafile(string filename)
-{
-	string trufilename = FOLDERNAME + filename;
-	fstream filereader;
-	long filesize;
-	FILE * sFile;
-	char outmsg[4096];
-	int bytes_read;
-	int bytes_sent;
-	int len;
-	stringstream longconverter;
-	try
-	{
-		if (VERBOSE) cout << "attempting to send the file " << trufilename 
-		<< "..." << endl;
-		sFile = fopen(filename.c_str(),"r");
-		fseek(sFile,0,SEEK_END);
-		filesize = ftell(sFile);
-		fclose(sFile);
-		if (VERBOSE) cout << trufilename << " is " << filesize << " bytes long" 
-		<< endl;
-		longconverter << filename << '\n' << filesize << '\n';
-		sendamsg(longconverter.str());
-		filereader.open(filename.c_str(), ios_base::in);
-		while (filesize > 0)
-		{
-			filereader.get(outmsg, sizeof outmsg);
-			bytes_read = (int)filereader.gcount();
-			filesize -= bytes_read;
-			outmsg[bytes_read] = '\0';
-			len = strlen(outmsg);
-			bytes_sent=send(newfd, outmsg, sizeof outmsg, 0);
-			if(bytes_sent==-1) {
-			if(VERBOSE) fprintf(stderr, "Error sending.\n");
-			bye(); exit(1); }
-			if(VERBOSE) printf("Sent %d of %d bytes.\n", bytes_sent, len);
-		}
-		if (VERBOSE) cout << "File " << trufilename << " successfully sent" << endl;
-		
-	}
-	catch(exception e)
-	{
-	cerr << "error sending or reading file: " << e.what() << endl;
-	}
 }
 
 // Kills child processess
