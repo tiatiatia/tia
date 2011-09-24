@@ -24,7 +24,6 @@ bye(); cleans up by closing the sockets
 #include <signal.h>
 #define BACKLOG 100
 #define SERVERPORT "6969"
-
 using namespace std;
 
 bool VERBOSE = false;
