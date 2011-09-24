@@ -20,12 +20,6 @@ int syncWithTIA() {
 	return 0;
 }
 
-void getFromClient(string ip, string filename) {
-	connectToClient(ip);
-	getafile(filename);
-	bye();
-}
-
 /* request() is a function that takes in a user entered
 string, sends "cheese" (sentinal value indicating a request)
 followed by the query to the TIA server, and receives the results.
