@@ -22,7 +22,6 @@ int communicate() {
 			messageholder << message;
 			string messageheader;
 			getline(messageholder,messageheader);
-			cout << messageheader;
 			if (messageheader.find("bacon")!= string::npos)
 			{
 				string ipaddress = getIpAddr();
