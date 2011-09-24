@@ -282,7 +282,7 @@ void sendafile(string filename)
 		<< endl;
 		longconverter << filename << '\n' << filesize << '\n';
 		sendamsg(longconverter.str());
-		filereader.open(filename.c_str(), ios_base::in);
+		filereader.open(trufilename.c_str(), ios_base::in);
 		while (filesize > 0)
 		{
 			filereader.get(outmsg, sizeof outmsg);
