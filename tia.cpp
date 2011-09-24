@@ -8,7 +8,7 @@
 using namespace std;
 
 string SHAREPATH; // path to their local folder used for sharing
-int MAX_RESULTS_TO_SHOW; // maximum number of query results to show the user
+int MAX_RESULTS_TO_SHOW = 15; // maximum number of query results to show the user
 
 /* sync() is called to send the server the client's
 file information. It can be done at any time without harm */
@@ -25,7 +25,9 @@ void getFromClient(string ip, string filetoget)
 	connectToClient(ip);
 	sendamsg(filetoget);
 	getafile();
+	bye();
 }
+
 /* request() is a function that takes in a user entered
 string, sends "cheese" (sentinal value indicating a request)
 followed by the query to the TIA server, and receives the results.
@@ -71,6 +73,16 @@ int main(int argc, char* argv[]) {
 	}
 	SHAREPATH = "./share/"; // initialize the sharing path to ./share/
 	syncWithTIA(); // Sync files in SHAREPATH with TIA server
+	if(!fork()) { // creates child process that listens for other clients needing a file
+		startServer(); // in net.h, sets up process as a server
+		while(true) { // main accept loop
+			acceptcon();
+			string fileRequested = getamsg();
+			sendafile(fileRequested);
+			close(newfd);
+		}
+		bye();
+	}
 	string input;
 	bool quit = false;
 	cout << "Type a file name to search for it in the database. Type \"quit\" to exit." << endl;
