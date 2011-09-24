@@ -12,7 +12,7 @@ int MAX_RESULTS_TO_SHOW; // maximum number of query results to show the user
 
 /* sync() is called to send the server the client's
 file information. It can be done at any time without harm */
-int sync() {
+int syncWithTIA() {
 	connectToTIA(); // handles all connection to TIA, contained in net.h
 	string fileinfo = listdir(SHAREPATH.c_str()); // find what's in SHAREPATH
 	sendamsg(fileinfo); // send file info to TIA server
@@ -49,7 +49,8 @@ void request(string query) {
 	}
 	int fileToGet; // read in which one they'd like to download
 	cin >> fileToGet;
-	getFromClient(IPs[fileToGet-1], Filenames[fileToGet-1]);
+	cout << "Attempting to get the file " << Filenames[fileToGet-1] << " from " << IPs[fileToGet-1] << endl;
+	//getFromClient(IPs[fileToGet-1], Filenames[fileToGet-1]);
 }
  
 int main(int argc, char* argv[]) {
@@ -63,7 +64,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	SHAREPATH = "./share/"; // initialize the sharing path to ./share/
-	sync(); // Sync files in SHAREPATH with TIA server
+	syncWithTIA(); // Sync files in SHAREPATH with TIA server
 	string input;
 	bool quit = false;
 	cout << "Type a file name to search for it in the database. Type \"quit\" to exit." << endl;
