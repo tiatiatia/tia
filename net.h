@@ -273,7 +273,7 @@ void sendafile(string filename)
 	{
 		if (VERBOSE) cout << "attempting to send the file " << trufilename 
 		<< "..." << endl;
-		sFile = fopen(filename.c_str(),"r");
+		sFile = fopen(trufilename.c_str(),"r");
 		fseek(sFile,0,SEEK_END);
 		filesize = ftell(sFile);
 		fclose(sFile);
@@ -281,7 +281,7 @@ void sendafile(string filename)
 		<< endl;
 		longconverter << filename << '\n' << filesize << '\n';
 		sendamsg(longconverter.str());
-		filereader.open(filename.c_str(), ios_base::in);
+		filereader.open(trufilename.c_str(), ios_base::in);
 		while (filesize > 0)
 		{
 			filereader.get(outmsg, sizeof outmsg);
