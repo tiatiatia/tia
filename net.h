@@ -69,7 +69,8 @@ void makeTIAsocket(string ip) // Create the socket, refered to by sockfd. Pass a
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
-	string port = ip == SERVERIP ? SERVERPORT : CLIENTPORT;
+//	string port = ip == SERVERIP ? SERVERPORT : CLIENTPORT;
+	string port = "9696";
 	if((status=getaddrinfo(ip.c_str(), port.c_str(), &hints, &res))!=0) {
 		if(VERBOSE) fprintf(stderr, "Error getting addrinfo: %s\n", gai_strerror(status));
 		else fprintf(stderr, "Could not connect to the TIA server.\n");
@@ -171,7 +172,7 @@ string getamsg()
 		returnstring += (char*)inmsg;
 		if(VERBOSE) printf("Receiving %d of %d bytes.\n", (int)strlen(inmsg), bytes_got);
 		if (endmsg) break;
-		bytes_got = recv(newfd, inmsg, sizeof inmsg, 0);
+		bytes_got = recv(sockfd, inmsg, sizeof inmsg, 0);
 	}
 
 	if(bytes_got==-1) {
@@ -196,8 +197,8 @@ void bindlisten()
 
 void acceptcon()
 {
-	newfd = accept(sockfd, (struct sockaddr*)&them, &((socklen_t)addr_size));
-	if(newfd==-1) {
+	sockfd = accept(sockfd, (struct sockaddr*)&them, &((socklen_t)addr_size));
+	if(sockfd==-1) {
 		if(VERBOSE) fprintf(stderr, "Error accepting\n");
 		else fprintf(stdin, "Sorry, could not accept connection.");
 	bye(); exit(1); }
@@ -246,7 +247,7 @@ void getafile()
 		filewriter.open(filename.c_str(), ios_base::out);
 		while (filesize > 0)
 		{
-			bytes_got = recv(newfd, inmsg, sizeof inmsg, 0);
+			bytes_got = recv(sockfd, inmsg, sizeof inmsg, 0);
 			filesize -= bytes_got;
 			filewriter.write(inmsg, bytes_got);
 		}
@@ -273,7 +274,7 @@ void sendafile(string filename)
 	{
 		if (VERBOSE) cout << "attempting to send the file " << trufilename 
 		<< "..." << endl;
-		sFile = fopen(filename.c_str(),"r");
+		sFile = fopen(trufilename.c_str(),"r");
 		fseek(sFile,0,SEEK_END);
 		filesize = ftell(sFile);
 		fclose(sFile);
@@ -289,7 +290,7 @@ void sendafile(string filename)
 			filesize -= bytes_read;
 			outmsg[bytes_read] = '\0';
 			len = strlen(outmsg);
-			bytes_sent=send(newfd, outmsg, sizeof outmsg, 0);
+			bytes_sent=send(sockfd, outmsg, sizeof outmsg, 0);
 			if(bytes_sent==-1) {
 			if(VERBOSE) fprintf(stderr, "Error sending.\n");
 			bye(); exit(1); }
