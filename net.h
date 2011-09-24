@@ -229,7 +229,7 @@ void sendamsg(string inputstring)
 }
 void getafile()
 {
-	sstream heraldreader;
+	stringstream heraldreader;
 	string herald = getamsg();
 	long filesize;
 	string filename;
@@ -260,31 +260,36 @@ void getafile()
 }
 void sendafile(string filename)
 {
-	trufilename = FOLDERNAME + filename;
+	string trufilename = FOLDERNAME + filename;
 	fstream filereader;
 	long filesize;
 	FILE * sFile;
 	char outmsg[4096];
 	int bytes_read;
+	int bytes_sent;
+	int len;
+	stringstream longconverter;
 	try
 	{
-		if (VERBOSE) cout << "attempting to send the file " << trufilename \
-		<< "..." <<< endl;
+		if (VERBOSE) cout << "attempting to send the file " << trufilename 
+		<< "..." << endl;
 		sFile = fopen(filename.c_str(),"r");
 		fseek(sFile,0,SEEK_END);
 		filesize = ftell(sFile);
 		fclose(sFile);
-		if (VERBOSE) cout << trufilename << " is " << filesize << " bytes long" \
+		if (VERBOSE) cout << trufilename << " is " << filesize << " bytes long" 
 		<< endl;
-		sendamsg(filename + '\n' + filesize + '\n');
+		longconverter << filename << '\n' << filesize << '\n';
+		sendamsg(longconverter.str());
 		filereader.open(filename.c_str(), ios_base::in);
 		while (filesize > 0)
 		{
-			bytes_read = filereader.get(outmsg, sizeof outmsg);
+			filereader.get(outmsg, sizeof outmsg);
+			bytes_read = (int)filereader.gcount();
 			filesize -= bytes_read;
 			outmsg[bytes_read] = '\0';
 			len = strlen(outmsg);
-			bytes_sent=send(newfd, outmsg, len, 0);
+			bytes_sent=send(newfd, outmsg, sizeof outmsg, 0);
 			if(bytes_sent==-1) {
 			if(VERBOSE) fprintf(stderr, "Error sending.\n");
 			bye(); exit(1); }
