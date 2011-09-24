@@ -46,9 +46,9 @@ void request(string query) {
 	ss << serverAnswer;
 	string parsed;
 	while(getline(ss,parsed)) { // as long as there's still a filename to read in
-		Filenames.push_back(parsed);
-		getline(ss,parsed);
 		IPs.push_back(parsed);
+		getline(ss,parsed);
+		Filenames.push_back(parsed);
 	}		// NOTE: IPs[i] corresponds to Filenames[i]
 	cout << "Found " << IPs.size() << " results. Type the number of the file you'd like to download.\n\n";
 	cout << "Number\t\tFilename\t\tIP\n";

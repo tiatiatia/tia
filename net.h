@@ -69,8 +69,8 @@ void makeTIAsocket(string ip) // Create the socket, refered to by sockfd. Pass a
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
-//	string port = ip == SERVERIP ? SERVERPORT : CLIENTPORT;
-	string port = "9696";
+	string port = ip == SERVERIP ? SERVERPORT : CLIENTPORT;
+//	string port = "9696";
 	if((status=getaddrinfo(ip.c_str(), port.c_str(), &hints, &res))!=0) {
 		if(VERBOSE) fprintf(stderr, "Error getting addrinfo: %s\n", gai_strerror(status));
 		else fprintf(stderr, "Could not connect to the TIA server.\n");
