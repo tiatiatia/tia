@@ -56,8 +56,12 @@ void request(string query) {
 	for(int i=0; i < IPs.size() && i < MAX_RESULTS_TO_SHOW ; i++) {  // displays results
 		cout << i+1 << "\t\t" << Filenames[i] << "\t\t" << IPs[i] << endl;
 	}
-	int fileToGet; // read in which one they'd like to download
-	cin >> fileToGet;
+	string fileToGetString; // read in which one they'd like to download
+	getline(cin,fileToGetString);
+	stringstream convertToInt;
+	convertToInt << fileToGetString;
+	int fileToGet;
+	convertToInt >> fileToGet;
 	cout << "Attempting to get the file " << Filenames[fileToGet-1] << " from " << IPs[fileToGet-1] << endl;
 	getFromClient(IPs[fileToGet-1], Filenames[fileToGet-1]);
 }
@@ -80,9 +84,8 @@ int main(int argc, char* argv[]) {
 			acceptcon();
 			string fileRequested = getamsg();
 			sendafile(fileRequested);
-			close(newfd);
+			bye();
 		}
-		bye();
 		exit(0);
 	}
 	string input;
