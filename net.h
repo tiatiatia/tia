@@ -62,11 +62,13 @@ void sigchld_handler(int s)
 void bye() // Things to handle when trying to exit
 {
 	close(sockfd);
+	close(newfd);
 	freeaddrinfo(res);
 }
 
 void makeTIAsocket(string ip) // Create the socket, refered to by sockfd. Pass a client's IP, or pass SERVERIP
 {
+	newfd = -1;
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
@@ -84,6 +86,7 @@ void makeTIAsocket(string ip) // Create the socket, refered to by sockfd. Pass a
 
 void makeServerSocket() // Create the socket, refered to by sockfd. Used to listen for other client connections
 {
+	newfd = -1; // initialize newfd
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
@@ -157,7 +160,9 @@ string getamsg()
 {
 	int bytes_got;
 	string returnstring;
-	bytes_got = recv(sockfd, inmsg, sizeof inmsg, 0);
+	if(newfd == -1) // if not in "server mode", accepting another client
+		bytes_got = recv(sockfd, inmsg, sizeof inmsg, 0);
+	else bytes_got = recv(newfd, inmsg, sizeof inmsg, 0); // newfd must be used
 	bool endmsg = false;
 	while(bytes_got>0) {
 		if (inmsg[bytes_got-1] == '\r')
@@ -197,7 +202,7 @@ void bindlisten()
 
 void acceptcon()
 {
-	sockfd = accept(sockfd, (struct sockaddr*)&them, &((socklen_t)addr_size));
+	newfd = accept(sockfd, (struct sockaddr*)&them, &((socklen_t)addr_size));
 	if(sockfd==-1) {
 		if(VERBOSE) fprintf(stderr, "Error accepting\n");
 		else fprintf(stdin, "Sorry, could not accept connection.");
@@ -221,7 +226,11 @@ void sendamsg(string inputstring)
 	int len, bytes_sent;
 	const char* outmsg = inputstring.c_str();
 	len = strlen(outmsg);
+	cout << newfd << endl;
+	cout << sockfd << endl;
+	if(newfd==-1) // check if we're in server mode
 	bytes_sent=send(sockfd, outmsg, len, 0);
+	else bytes_sent=send(newfd, outmsg, len, 0);
 	if(bytes_sent==-1) {
 			if(VERBOSE) fprintf(stderr, "Error sending.\n");
 				else printf("Error connecting to the TIA server.\n");
@@ -284,12 +293,24 @@ void sendafile(string filename)
 		longconverter << filename << '\n' << filesize << '\n';
 		sendamsg(longconverter.str());
 		filereader.open(trufilename.c_str(), ios_base::in);
-		while (filesize > 0)
+		/*while (filesize > 0)
 		{
 			filereader.get(outmsg, sizeof outmsg, NULL);
 			bytes_read = filereader.gcount();
+			cout << "bytes_read: " << bytes_read << endl;
 			filesize -= bytes_read;
 			bytes_sent=send(sockfd, outmsg, bytes_read, 0);
+			if(bytes_sent==-1) {
+			if(VERBOSE) fprintf(stderr, "Error sending.\n");
+			bye(); exit(1); }
+			if(VERBOSE) printf("Sent %d of %d bytes.\n", bytes_sent, bytes_read);
+		}*/
+		while (filereader.good())
+		{
+			filereader.read(outmsg, sizeof outmsg);
+			bytes_read = filereader.gcount();
+			cout << "bytes_read: " << bytes_read << endl;
+			bytes_sent=send(newfd, outmsg, bytes_read, 0);
 			if(bytes_sent==-1) {
 			if(VERBOSE) fprintf(stderr, "Error sending.\n");
 			bye(); exit(1); }
