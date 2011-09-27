@@ -8,7 +8,7 @@
 using namespace std;
 
 string SHAREPATH; // path to their local folder used for sharing
-int MAX_RESULTS_TO_SHOW; // maximum number of query results to show the user
+int MAX_RESULTS_TO_SHOW = 15; // maximum number of query results to show the user
 
 /* sync() is called to send the server the client's
 file information. It can be done at any time without harm */
@@ -18,6 +18,15 @@ int syncWithTIA() {
 	sendamsg(fileinfo); // send file info to TIA server
 	bye(); // close the connection
 	return 0;
+}
+
+/* Gets the given file filetoget from the given client, ip */
+void getFromClient(string ip, string filetoget)
+{
+	connectToClient(ip);
+	sendamsg(filetoget);
+	getafile();
+	bye();
 }
 
 /* request() is a function that takes in a user entered
@@ -38,9 +47,9 @@ void request(string query) {
 	ss << serverAnswer;
 	string parsed;
 	while(getline(ss,parsed)) { // as long as there's still a filename to read in
-		Filenames.push_back(parsed);
-		getline(ss,parsed);
 		IPs.push_back(parsed);
+		getline(ss,parsed);
+		Filenames.push_back(parsed);
 	}		// NOTE: IPs[i] corresponds to Filenames[i]
 	cout << "Found " << IPs.size() << " results. Type the number of the file you'd like to download.\n\n";
 	cout << "Number\t\tFilename\t\tIP\n";
@@ -49,7 +58,8 @@ void request(string query) {
 	}
 	int fileToGet; // read in which one they'd like to download
 	cin >> fileToGet;
-	//getFromClient(IPs[fileToGet-1], Filenames[fileToGet-1]);
+	cout << "Attempting to get the file " << Filenames[fileToGet-1] << " from " << IPs[fileToGet-1] << endl;
+	getFromClient(IPs[fileToGet-1], Filenames[fileToGet-1]);
 }
  
 int main(int argc, char* argv[]) {
@@ -64,6 +74,16 @@ int main(int argc, char* argv[]) {
 	}
 	SHAREPATH = "./share/"; // initialize the sharing path to ./share/
 	syncWithTIA(); // Sync files in SHAREPATH with TIA server
+	if(!fork()) { // creates child process that listens for other clients needing a file
+		startServer(); // in net.h, sets up process as a server
+		while(true) { // main accept loop
+			acceptcon();
+			string fileRequested = getamsg();
+			sendafile(fileRequested);
+			close(newfd);
+		}
+		bye();
+	}
 	string input;
 	bool quit = false;
 	cout << "Type a file name to search for it in the database. Type \"quit\" to exit." << endl;
