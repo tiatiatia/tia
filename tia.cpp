@@ -75,14 +75,15 @@ int main(int argc, char* argv[]) {
 	SHAREPATH = "./share/"; // initialize the sharing path to ./share/
 	syncWithTIA(); // Sync files in SHAREPATH with TIA server
 	if(!fork()) { // creates child process that listens for other clients needing a file
-		startServer(); // in net.h, sets up process as a server
 		while(true) { // main accept loop
+			startServer(); // in net.h, sets up process as a server
 			acceptcon();
 			string fileRequested = getamsg();
 			sendafile(fileRequested);
 			close(newfd);
 		}
 		bye();
+		exit(0);
 	}
 	string input;
 	bool quit = false;
