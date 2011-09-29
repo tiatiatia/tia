@@ -20,6 +20,7 @@ int syncWithTIA() {
 	return 0;
 }
 
+/* Gets the given file filetoget from the given client, ip */
 void getFromClient(string ip, string filetoget)
 {
 	connectToClient(ip);
@@ -55,8 +56,12 @@ void request(string query) {
 	for(int i=0; i < IPs.size() && i < MAX_RESULTS_TO_SHOW ; i++) {  // displays results
 		cout << i+1 << "\t\t" << Filenames[i] << "\t\t" << IPs[i] << endl;
 	}
-	int fileToGet; // read in which one they'd like to download
-	cin >> fileToGet;
+	string fileToGetString; // read in which one they'd like to download
+	getline(cin,fileToGetString);
+	stringstream convertToInt;
+	convertToInt << fileToGetString;
+	int fileToGet;
+	convertToInt >> fileToGet;
 	cout << "Attempting to get the file " << Filenames[fileToGet-1] << " from " << IPs[fileToGet-1] << endl;
 	getFromClient(IPs[fileToGet-1], Filenames[fileToGet-1]);
 }
@@ -74,14 +79,14 @@ int main(int argc, char* argv[]) {
 	SHAREPATH = "./share/"; // initialize the sharing path to ./share/
 	syncWithTIA(); // Sync files in SHAREPATH with TIA server
 	if(!fork()) { // creates child process that listens for other clients needing a file
-		startServer(); // in net.h, sets up process as a server
 		while(true) { // main accept loop
+			startServer(); // in net.h, sets up process as a server
 			acceptcon();
 			string fileRequested = getamsg();
 			sendafile(fileRequested);
-			close(newfd);
+			bye();
 		}
-		bye();
+		exit(0);
 	}
 	string input;
 	bool quit = false;

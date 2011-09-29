@@ -1,5 +1,3 @@
-// tiaserver.cpp is the main file for running the tia server
-
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -11,7 +9,7 @@ using namespace std;
 
 int communicate() {
 	startServer();
-	
+
 	while(1) {
 		acceptcon();
 
@@ -22,7 +20,6 @@ int communicate() {
 			messageholder << message;
 			string messageheader;
 			getline(messageholder,messageheader);
-			cout << messageheader;
 			if (messageheader.find("bacon")!= string::npos)
 			{
 				string ipaddress = getIpAddr();
@@ -41,7 +38,7 @@ int communicate() {
 		}
 		close(newfd);
 	}
-	
+
 	bye();
 	return 0;
 }
@@ -58,3 +55,4 @@ int main(int argc, const char *argv[]) {
 	communicate();
 	return 0;
 }
+
