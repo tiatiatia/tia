@@ -24,10 +24,11 @@ bye(); cleans up by closing the sockets
 #include <signal.h>
 #define BACKLOG 100
 #define SERVERPORT "6969"
+
 using namespace std;
 
 bool VERBOSE = false;
-char inmsg[4096];
+
 struct addrinfo hints, *res;
 int sockfd, newfd, status;
 struct sockaddr_storage them;
@@ -108,6 +109,7 @@ void acceptcon()
 string getamsg()
 {
 	int bytes_got;
+	char inmsg[4096];
 	bool endmsg=false;
 	string returnstring;
 	bytes_got = recv(newfd, inmsg, sizeof inmsg, 0);
@@ -137,7 +139,6 @@ string getamsg()
 
 void sendamsg(string inputstring)
 {
-	inputstring += '\r'
 	int len, bytes_sent;
 	const char* outmsg = inputstring.c_str();
 	len = strlen(outmsg);
