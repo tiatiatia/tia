@@ -47,7 +47,7 @@ string stripCaps(string inputstr)
 	}
 	return inputstr;
 }
-string searchFiles(string searchstr)
+string searchFiles(string searchstr, string clientIP)
 {
 // this takes a string and searches through every line of every file
 // in the folder /Addresses/ in an attempt to find a full match of the string
@@ -58,6 +58,7 @@ string searchFiles(string searchstr)
 // the filename is assumed to be an IP address and the lines in the files
 // are assumed to be file names, so the return value should be 
 // alternating IP Address and file names
+	cout << clientIP<<endl;
 	searchstr = stripCaps(searchstr);
 	fstream searchfile;
 	stringstream filelist;
