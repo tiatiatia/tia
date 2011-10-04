@@ -58,7 +58,6 @@ string searchFiles(string searchstr, string clientIP)
 // the filename is assumed to be an IP address and the lines in the files
 // are assumed to be file names, so the return value should be 
 // alternating IP Address and file names
-	cout << clientIP<<endl;
 	searchstr = stripCaps(searchstr);
 	fstream searchfile;
 	stringstream filelist;
@@ -72,21 +71,24 @@ string searchFiles(string searchstr, string clientIP)
 		getline(filelist,filename); //get rid of bacon herald message
 		while(getline(filelist,filename))
 		{ // search through each file
-			filename = "./Addresses/"+filename; // move directories
-			searchfile.open(filename.c_str(), ios_base::in);
-			filename = filename.erase(0,12); // format our file name to output
-			filename.erase(filename.end() - 4,filename.end());
-			while (getline(searchfile,listing))
-			{// search through each line
-				listing = stripCaps(listing); 
-				if ( listing.find(searchstr.c_str()) != string::npos)
-				{ // found a match
-				if (VERBOSE) cout << "Found match at "<< filename << "in file " << listing << endl;
-					searchresults+=filename + '\n' + 
-					listing + '\n';
+			if(filename!=clientIP+".txt")
+			{
+				filename = "./Addresses/"+filename; // move directories
+				searchfile.open(filename.c_str(), ios_base::in);
+				filename = filename.erase(0,12); // format our file name to output
+				filename.erase(filename.end() - 4,filename.end());
+				while (getline(searchfile,listing))
+				{// search through each line
+					listing = stripCaps(listing); 
+					if ( listing.find(searchstr.c_str()) != string::npos)
+					{ // found a match
+					if (VERBOSE) cout << "Found match at "<< filename << "in file " << listing << endl;
+						searchresults+=filename + '\n' + 
+						listing + '\n';
+					}
 				}
+				searchfile.close();
 			}
-			searchfile.close();
 		}
 	}
 	catch (exception e)
