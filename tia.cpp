@@ -65,6 +65,12 @@ void request(string query) {
 	cout << "Attempting to get the file " << Filenames[fileToGet-1] << " from " << IPs[fileToGet-1] << endl;
 	getFromClient(IPs[fileToGet-1], Filenames[fileToGet-1]);
 }
+void disconnect() {
+	string serverQuery = "later";	//quit signal
+	connectToTIA();	// open server connection
+	sendamsg(serverQuery);	//send query
+	bye();
+}
  
 int main(int argc, char* argv[]) {
 	VERBOSE = false;
@@ -93,7 +99,7 @@ int main(int argc, char* argv[]) {
 	cout << "Type a file name to search for it in the database. Type \"quit\" to exit." << endl;
 	while(!quit) {
 		getline(cin, input);
-		if(input == "quit") quit = true;
+		if(input == "quit") {quit = true;disconnect();}
 		else request(input);
 	}
 	return 0;

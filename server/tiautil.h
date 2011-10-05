@@ -117,3 +117,44 @@ void writeString(string content, string name){
 			cerr << "File operation on file" << name <<" failed: " << e.what() << endl;
 		}
 }
+void addString(string content, string name){
+// This function appends a string to a file
+// used by server to add connected IP addresses
+	fstream filewriter;
+	name = name + ".txt";
+	try
+	{
+		if (VERBOSE) cout << "Adding to file " << name << "..." << endl;
+		filewriter.open(name.c_str(), ios_base::in | ios_base::out | ios_base::ate);
+		filewriter << content;
+		filewriter.close();
+	}
+	catch(exception e)
+	{
+		cerr << "File operation on file" << name <<" failed: " << e.what() << endl;
+	}
+}
+void removeString(string content, string name){
+// This function takes a string and removes it from a file of the given name
+// used by server to remove connected IP addresses
+	string origName=name;
+	name = name + ".txt";
+	try
+	{
+		if (VERBOSE) cout << "Removing from file " << name << "..." << endl;
+		ifstream fin(name.c_str());
+		string fileContents,temp;
+		while(fin>>temp)
+		{
+			if(temp==content)
+			{}
+			else
+				fileContents+=temp+"\n";
+		}
+		writeString(fileContents, origName);
+	}
+	catch(exception e)
+	{
+		cerr << "File operation on file" << name <<" failed: " << e.what() << endl;
+	}
+}

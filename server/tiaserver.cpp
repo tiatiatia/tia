@@ -9,7 +9,7 @@ using namespace std;
 
 int communicate() {
 	startServer();
-
+	
 	while(1) {
 		acceptcon();
 
@@ -24,7 +24,8 @@ int communicate() {
 			{
 				string ipaddress = getIpAddr();
 				string datavalues = messageholder.str();
-				writeString(datavalues,"./Addresses/" + ipaddress); 
+				writeString(datavalues,"./Addresses/" + ipaddress);
+				addString(getIpAddr()+"\n", "./connectedClients");
 			}
 			if (messageheader.find("cheese")!=string::npos)
 			{
@@ -32,6 +33,10 @@ int communicate() {
 				getline(messageholder, searchstr);
 				string searchresults = searchFiles(searchstr, getIpAddr());
 				sendamsg(searchresults);
+			}
+			if(messageheader.find("later")!=string::npos)
+			{
+				removeString(getIpAddr(), "./connectedClients");
 			}
 			close(newfd);
 			exit(0);
