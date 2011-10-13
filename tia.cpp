@@ -14,7 +14,7 @@ int MAX_RESULTS_TO_SHOW = 15; // maximum number of query results to show the use
 file information. It can be done at any time without harm */
 int syncWithTIA() {
 	connectToTIA(); // handles all connection to TIA, contained in net.h
-	string fileinfo = listdir(SHAREPATH.c_str()); // find what's in SHAREPATH
+	string fileinfo = listShareInfo(); // find what's in SHAREPATH
 	sendamsg(fileinfo); // send file info to TIA server
 	bye(); // close the connection
 	return 0;

@@ -32,10 +32,10 @@ Finally, call bye() to close sockets.
 #define CLIENTPORT "9696"
 //#define SERVERIP "140.103.108.219"  // spencer
 //#define SERVERIP "140.103.108.174"  // 3714
-#define SERVERIP "140.103.108.226"	//trisha
+//#define SERVERIP "140.103.108.226"	//trisha
 //#define SERVERIP "140.103.47.21"	//killian
 #define FOLDERNAME "./share/"
-//#define SERVERIP "127.0.0.1"
+#define SERVERIP "127.0.0.1"
 #define BACKLOG 100
 
 using namespace std;
@@ -228,8 +228,6 @@ void sendamsg(string inputstring)
 	int len, bytes_sent;
 	const char* outmsg = inputstring.c_str();
 	len = strlen(outmsg);
-	cout << newfd << endl;
-	cout << sockfd << endl;
 	if(newfd==-1) // check if we're in server mode
 	bytes_sent=send(sockfd, outmsg, len, 0);
 	else bytes_sent=send(newfd, outmsg, len, 0);
