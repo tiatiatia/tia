@@ -29,6 +29,7 @@ string listdir(const char *path) {
   while((entry = readdir(dp)))
   { // read all files in directory
     filelist << entry->d_name;
+	  cout << entry->d_name << endl;
     filelist << '\n';
     }
   closedir(dp);

@@ -36,7 +36,7 @@ int communicate() {
 			{ // search request-- initiate search
 				string searchstr;
 				getline(messageholder, searchstr);
-				string searchresults = searchFiles(searchstr);
+				string searchresults = searchFiles(searchstr, getIpAddr());
 				sendamsg(searchresults);
 			}
 			close(newfd);

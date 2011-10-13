@@ -51,7 +51,7 @@ string stripCaps(string inputstr)
 	}
 	return inputstr;
 }
-string searchFiles(string searchstr)
+string searchFiles(string searchstr, string clientIP)
 {
 // this takes a string and searches through every line of every file
 // in the folder /Addresses/ in an attempt to find a full match of the string
@@ -75,21 +75,24 @@ string searchFiles(string searchstr)
 		getline(filelist,filename); //get rid of bacon herald message
 		while(getline(filelist,filename))
 		{ // search through each file
-			filename = "./Addresses/"+filename; // move directories
-			searchfile.open(filename.c_str(), ios_base::in);
-			filename = filename.erase(0,12); // format our file name to output
-			filename.erase(filename.end() - 4,filename.end());
-			while (getline(searchfile,listing))
-			{// search through each line
-				listing = stripCaps(listing); 
-				if ( listing.find(searchstr.c_str()) != string::npos)
-				{ // found a match
-				if (VERBOSE) cout << "Found match at "<< filename << "in file " << listing << endl;
-					searchresults+=filename + '\n' + 
-					listing + '\n';
+			if(filename!=clientIP+".txt")
+			{
+				filename = "./Addresses/"+filename; // move directories
+				searchfile.open(filename.c_str(), ios_base::in);
+				filename = filename.erase(0,12); // format our file name to output
+				filename.erase(filename.end() - 4,filename.end());
+				while (getline(searchfile,listing))
+				{// search through each line
+					listing = stripCaps(listing); 
+					if ( listing.find(searchstr.c_str()) != string::npos)
+					{ // found a match
+					if (VERBOSE) cout << "Found match at "<< filename << "in file " << listing << endl;
+						searchresults+=filename + '\n' + 
+						listing + '\n';
+					}
 				}
+				searchfile.close();
 			}
-			searchfile.close();
 		}
 	}
 	catch (exception e)
