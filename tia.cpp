@@ -43,21 +43,35 @@ void request(string query) {
 	bye(); // close connection
 	vector<string> IPs;	// holds the parsed IPs
 	vector<string> Filenames;  // holds the parsed filenames
+	vector<string> FileSizes;	 // holds the file size info
 	stringstream ss;
 	ss << serverAnswer;
 	string parsed;
 	while(getline(ss,parsed)) { // as long as there's still a filename to read in
 		IPs.push_back(parsed);
 		getline(ss,parsed);
-		Filenames.push_back(parsed);
+		string resultName = "", resultSize = "";
+		int i;
+		for(i=0;i<parsed.size();i++) {
+			if(parsed[i]=='\t') break;
+			else resultName+=parsed[i];
+		}
+		i++;
+		for(i=0;i<parsed.size();i++) {
+			if(parsed[i]=='\t') break;
+			else resultSize+=parsed[i];
+		}
+		Filenames.push_back(resultName);
+		FileSizes.push_back(resultSize);
 	}		// NOTE: IPs[i] corresponds to Filenames[i]
-	cout << "Found " << IPs.size() << " results. Type the number of the file you'd like to download.\n\n";
-	cout << "Number\t\tFilename\t\tIP\n";
+	cout << "Found " << IPs.size() << " results. Type the number of the file you'd like to download, or \"cancel\".\n\n";
+	cout << "Number\t\tFilename\t\tSize\t\tIP\n";
 	for(int i=0; i < IPs.size() && i < MAX_RESULTS_TO_SHOW ; i++) {  // displays results
 		cout << i+1 << "\t\t" << Filenames[i] << "\t\t" << IPs[i] << endl;
 	}
 	string fileToGetString; // read in which one they'd like to download
 	getline(cin,fileToGetString);
+	if(stripCaps(fileToGetString)=="cancel") return;
 	stringstream convertToInt;
 	convertToInt << fileToGetString;
 	int fileToGet;
