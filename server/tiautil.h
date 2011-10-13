@@ -1,3 +1,7 @@
+/* Tiautil
+* This is a collection of miscellaneous string/file-io related functions
+* that are used in both TIA client and TIA server
+*/
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -5,7 +9,7 @@
 #include <dirent.h>
 using namespace std;
 
-extern bool VERBOSE;
+extern bool VERBOSE; //indicates whether the user is in verbose mode
 
 string listdir(const char *path) {
 // Takes in a directory name and returns
