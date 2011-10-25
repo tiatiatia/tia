@@ -79,8 +79,15 @@ string searchFiles(string searchstr, string clientIP)
 				filename.erase(filename.end() - 4,filename.end());
 				while (getline(searchfile,listing))
 				{// search through each line
-					listing = stripCaps(listing); 
-					if ( listing.find(searchstr.c_str()) != string::npos)
+					string namelisting = ""; // "listing" has name, size, and hash
+					for(int i=0;i<listing.size();i++) // we only need the name
+					{
+						if(listing[i]=='\t') // once a tab is encountered, we have the name
+							break;
+						else namelisting+=listing[i];
+					}
+					namelisting = stripCaps(namelisting); 
+					if ( namelisting.find(searchstr.c_str()) != string::npos)
 					{ // found a match
 					if (VERBOSE) cout << "Found match at "<< filename << "in file " << listing << endl;
 						searchresults+=filename + '\n' + 
@@ -117,6 +124,7 @@ void writeString(string content, string name){
 			cerr << "File operation on file" << name <<" failed: " << e.what() << endl;
 		}
 }
+
 void addString(string content, string name){
 // This function appends a string to a file
 // used by server to add connected IP addresses
@@ -134,6 +142,7 @@ void addString(string content, string name){
 		cerr << "File operation on file" << name <<" failed: " << e.what() << endl;
 	}
 }
+
 void removeString(string content, string name){
 // This function takes a string and removes it from a file of the given name
 // used by server to remove connected IP addresses
