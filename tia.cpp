@@ -29,6 +29,14 @@ void getFromClient(string ip, string filetoget)
 	bye();
 }
 
+void imAlive(void)
+{
+	string serverQuery="alive";
+	connectToTia();
+	sendamsg(serverQuery);
+	bye();
+}
+
 /* request() is a function that takes in a user entered
 string, sends "cheese" (sentinal value indicating a request)
 followed by the query to the TIA server, and receives the results.
@@ -80,10 +88,23 @@ int main(int argc, char* argv[]) {
 	syncWithTIA(); // Sync files in SHAREPATH with TIA server
 	if(!fork()) { // creates child process that listens for other clients needing a file
 		while(true) { // main accept loop
+			cout << "here" << endl;
 			startServer(); // in net.h, sets up process as a server
 			acceptcon();
 			string fileRequested = getamsg();
 			sendafile(fileRequested);
+			bye();
+		}
+		exit(0);
+	}
+	if(!fork()) {
+		while(true) {
+			clock_t endwait;
+			int seconds = 5;
+			endwait = clock () + seconds * CLOCKS_PER_SEC ;
+			while (clock() < endwait) {}
+			//send things to server
+			imAlive();
 			bye();
 		}
 		exit(0);
