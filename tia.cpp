@@ -112,7 +112,8 @@ int main(int argc, char* argv[]) {
 	bool quit = false;
 	cout << "Type a file name to search for it in the database. Type \"quit\" to exit." << endl;
 	while(!quit) {
-		getline(cin, input);
+		while(!getline(cin, input))
+			cout << "no input" << endl;
 		if(input == "quit") {quit = true;disconnect();}
 		else request(input);
 	}

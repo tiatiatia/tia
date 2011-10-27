@@ -30,10 +30,10 @@ Finally, call bye() to close sockets.
 //#include "tiautil.h"
 #define SERVERPORT "6969"
 #define CLIENTPORT "9696"
-#define SERVERIP "140.103.108.219"  // spencer
+//#define SERVERIP "140.103.108.219"  // spencer
 //#define SERVERIP "140.103.108.174"  // 3714
 //#define SERVERIP "140.103.108.226"	//trisha
-//#define SERVERIP "140.103.47.21"	//killian
+#define SERVERIP "140.103.37.76"	//killian
 #define FOLDERNAME "./share/"
 //#define SERVERIP "127.0.0.1"
 #define BACKLOG 100
