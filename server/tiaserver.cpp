@@ -33,10 +33,6 @@ int communicate() {
 				string searchresults = searchFiles(searchstr, getIpAddr());
 				sendamsg(searchresults);
 			}
-			if (messageheader.find("alive")!=sstring::npos)
-			{
-
-			}
 			close(newfd);
 			exit(0);
 		}
