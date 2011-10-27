@@ -29,6 +29,14 @@ void getFromClient(string ip, string filetoget)
 	bye();
 }
 
+void imAlive(void)
+{
+	string serverQuery="alive";
+	connectToTIA();
+	sendamsg(serverQuery);
+	bye();
+}
+
 /* request() is a function that takes in a user entered
 string, sends "cheese" (sentinal value indicating a request)
 followed by the query to the TIA server, and receives the results.
@@ -108,12 +116,21 @@ int main(int argc, char* argv[]) {
 		}
 		exit(0);
 	}
+	if(!fork()) {
+		while(true) {
+			clock_t endwait;
+			int seconds = 5;
+			endwait=clock() + seconds*CLOCKS_PER_SEC;
+			while(clock()<endwait){}
+			imAlive();
+			bye();
+		}
+		exit(0);
+	}
 	string input;
 	bool quit = false;
 	cout << "Type a file name to search for it in the database. Type \"quit\" to exit." << endl;
 	while(!quit) {
-		while(!getline(cin, input))
-			cout << "no input" << endl;
 		if(input == "quit") {quit = true;disconnect();}
 		else request(input);
 	}

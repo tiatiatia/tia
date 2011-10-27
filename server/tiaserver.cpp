@@ -25,7 +25,7 @@ int communicate() {
 				string ipaddress = getIpAddr();
 				string datavalues = messageholder.str();
 				writeString(datavalues,"./Addresses/" + ipaddress);
-				addString(getIpAddr()+"\n", "./connectedClients");
+				//addString(getIpAddr()+"\n", "./connectedClients");
 			}
 			if (messageheader.find("cheese")!=string::npos)
 			{
@@ -34,12 +34,25 @@ int communicate() {
 				string searchresults = searchFiles(searchstr, getIpAddr());
 				sendamsg(searchresults);
 			}
+			if(messageheader.find("alive")!=string::npos)
+			{
+				addString(getIpAddr()+"\n", "./connectedClients");
+			}
 			if(messageheader.find("later")!=string::npos)
 			{
 				removeString(getIpAddr(), "./connectedClients");
 			}
 			close(newfd);
 			exit(0);
+		}
+		if(!fork()) {
+			while(true) {
+				clock_t endwait;
+				int seconds = 60;
+				endwait = clock()+seconds*CLOCKS_PER_SEC;
+				while(clock() < endwait) {}
+				writeString("", "./connectedClients");
+			}
 		}
 		close(newfd);
 	}
