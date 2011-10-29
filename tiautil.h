@@ -67,7 +67,6 @@ string listdir(const char *path) {
     return NULL;
   }
   if (VERBOSE) cout << "reading filenames in directory " << path << "...";
-  filelist << "bacon\n";
   while((entry = readdir(dp)))
   { // read all files in directory
     filelist << entry->d_name;

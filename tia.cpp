@@ -63,11 +63,11 @@ void request(string query) {
 		}
 		Filenames.push_back(resultName);
 		FileSizes.push_back(resultSize);
-	}		// NOTE: IPs[i] corresponds to Filenames[i]
+	}		// NOTE: IPs[i] corresponds to Filenames[i] and FileSizes[i]
 	cout << "Found " << IPs.size() << " results. Type the number of the file you'd like to download, or \"cancel\".\n\n";
 	cout << "Number\t\tFilename\t\tSize\t\tIP\n";
 	for(int i=0; i < IPs.size() && i < MAX_RESULTS_TO_SHOW ; i++) {  // displays results
-		cout << i+1 << "\t\t" << Filenames[i] << "\t\t" << IPs[i] << endl;
+		cout << i+1 << "\t\t" << Filenames[i] << "\t\t" << FileSizes[i] << "\t\t" << IPs[i] << endl;
 	}
 	string fileToGetString; // read in which one they'd like to download
 	getline(cin,fileToGetString);

@@ -10,7 +10,6 @@ extern bool VERBOSE;
 string listdir(const char *path) {
 // Takes in a directory name and returns
 // a list of file names separated by newline characters
-// used in the client program to get a list of file names to send to the server
 // used in the server to search through its IP databases
   stringstream filelist;
   struct dirent *entry;
@@ -21,7 +20,6 @@ string listdir(const char *path) {
     return NULL;
   }
   if (VERBOSE) cout << "reading filenames in directory " << path << "...";
-  filelist << "bacon\n";
   while((entry = readdir(dp)))
   { // read all files in directory
     filelist << entry->d_name;
