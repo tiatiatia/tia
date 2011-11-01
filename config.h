@@ -45,7 +45,6 @@ void getConfig(){
 				if (!rc && (int)myregmatch[0].rm_eo!= 0)
 				{
 					int diff = (int)myregmatch[0].rm_eo;
-					cout << diff << endl;
 					parseline = inliner.substr(0, diff);
 					for(int i=0;i<NUMVARS;i++)
 					{
