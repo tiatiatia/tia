@@ -34,6 +34,7 @@ Finally, call bye() to close sockets.
 //#define SERVERIP "140.103.108.174"  // 3714
 //#define SERVERIP "140.103.108.226"	//trisha
 //#define SERVERIP "140.103.47.21"	//killian
+//#define SERVERIP "140.103.108.176" // evan's tay computer
 #define FOLDERNAME "./share/"
 #define SERVERIP "127.0.0.1"
 #define BACKLOG 100
@@ -136,12 +137,10 @@ void connectto() // Open the connection
 		inet_ntop(AF_INET, &(((struct sockaddr_in*)(&them))->sin_addr), ip4, INET_ADDRSTRLEN);
 		portnum = ntohs( ((struct sockaddr_in*)(&them))->sin_port );
 		if(VERBOSE) printf("Connected to %s:%d\n",ip4,portnum);
-		else printf("Connected to the TIA server.\n");
 	} else {
 		inet_ntop(AF_INET6, &(((struct sockaddr_in6*)(&them))->sin6_addr), ip6, INET6_ADDRSTRLEN);
 		portnum = ntohs( ((struct sockaddr_in6*)(&them))->sin6_port );
 		if(VERBOSE) printf("Connected to %s:%d\n",ip6,portnum);
-		else printf("Connected to the TIA server.\n");
 	}
 }
 
@@ -199,7 +198,7 @@ void bindlisten()
 		if(VERBOSE) fprintf(stderr, "Error listening.\n");
 		else fprintf(stdin, "Sorry, could not start server.");
 	bye(); exit(1); }
-	printf("Server successfully started. Waiting for connections...\n");
+	if(VERBOSE) printf("Server successfully started. Waiting for connections...\n");
 }
 
 void acceptcon()

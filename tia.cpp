@@ -17,6 +17,7 @@ int syncWithTIA() {
 	string fileinfo = listShareInfo(); // find what's in SHAREPATH
 	sendamsg(fileinfo); // send file info to TIA server
 	bye(); // close the connection
+	cout << "Successfully connected to the TIA server.\n";
 	return 0;
 }
 
@@ -57,13 +58,17 @@ void request(string query) {
 			else resultName+=parsed[i];
 		}
 		i++;
-		for(i=0;i<parsed.size();i++) {
+		for(;i<parsed.size();i++) {
 			if(parsed[i]=='\t') break;
 			else resultSize+=parsed[i];
 		}
 		Filenames.push_back(resultName);
 		FileSizes.push_back(resultSize);
 	}		// NOTE: IPs[i] corresponds to Filenames[i] and FileSizes[i]
+	if(IPs.size()==0) {
+		cout << "Sorry, no results found. Type in a new search query.\n";
+		return;
+	}
 	cout << "Found " << IPs.size() << " results. Type the number of the file you'd like to download, or \"cancel\".\n\n";
 	cout << "Number\t\tFilename\t\tSize\t\tIP\n";
 	for(int i=0; i < IPs.size() && i < MAX_RESULTS_TO_SHOW ; i++) {  // displays results
@@ -104,8 +109,8 @@ int main(int argc, char* argv[]) {
 	}
 	string input;
 	bool quit = false;
-	cout << "Type a file name to search for it in the database. Type \"quit\" to exit." << endl;
 	while(!quit) {
+		cout << "Type a file name to search for it in the database. Type \"quit\" to exit." << endl;
 		getline(cin, input);
 		if(input == "quit") quit = true;
 		else request(input);

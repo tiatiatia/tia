@@ -28,7 +28,7 @@ string listdir(const char *path) {
   closedir(dp);
   string output = filelist.str();
   // here we remove the troublesome dot and double dot file names
-  while ((output[6] == '\n') || (output[6] == '.')) output.erase(output.begin()+6);
+  while ((output[0] == '\n') || (output[0] == '.')) output.erase(output.begin());
   return output;
 }
 string stripCaps(string inputstr)
@@ -66,10 +66,10 @@ string searchFiles(string searchstr, string clientIP)
 	try
 	{
 		if (VERBOSE) cout << "Searching database for \"" << searchstr << "\"..."<< endl;
-		getline(filelist,filename); //get rid of bacon herald message
+		//getline(filelist,filename); //get rid of bacon herald message
 		while(getline(filelist,filename))
 		{ // search through each file
-			if(filename!=clientIP+".txt")
+			if(filename!=clientIP+".txt" && filename.size() > 4)
 			{
 				filename = "./Addresses/"+filename; // move directories
 				searchfile.open(filename.c_str(), ios_base::in);
