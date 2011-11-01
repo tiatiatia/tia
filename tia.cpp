@@ -2,19 +2,21 @@
 
 #include <iostream>
 #include <vector>
-#include "tiautil.h"
 #include "net.h"
+#include "tiautil.h"
+#include "config.h"
 
 using namespace std;
 
-string SHAREPATH; // path to their local folder used for sharing
+extern string FOLDERNAME;// path to their local folder used for sharing
+extern string SERVERIP;
 int MAX_RESULTS_TO_SHOW = 15; // maximum number of query results to show the user
 
 /* sync() is called to send the server the client's
 file information. It can be done at any time without harm */
 int syncWithTIA() {
 	connectToTIA(); // handles all connection to TIA, contained in net.h
-	string fileinfo = listdir(SHAREPATH.c_str()); // find what's in SHAREPATH
+	string fileinfo = listShareInfo(); // find what's in SHAREPATH
 	sendamsg(fileinfo); // send file info to TIA server
 	bye(); // close the connection
 	return 0;
@@ -43,21 +45,35 @@ void request(string query) {
 	bye(); // close connection
 	vector<string> IPs;	// holds the parsed IPs
 	vector<string> Filenames;  // holds the parsed filenames
+	vector<string> FileSizes;	 // holds the file size info
 	stringstream ss;
 	ss << serverAnswer;
 	string parsed;
 	while(getline(ss,parsed)) { // as long as there's still a filename to read in
 		IPs.push_back(parsed);
 		getline(ss,parsed);
-		Filenames.push_back(parsed);
+		string resultName = "", resultSize = "";
+		int i;
+		for(i=0;i<parsed.size();i++) {
+			if(parsed[i]=='\t') break;
+			else resultName+=parsed[i];
+		}
+		i++;
+		for(i=0;i<parsed.size();i++) {
+			if(parsed[i]=='\t') break;
+			else resultSize+=parsed[i];
+		}
+		Filenames.push_back(resultName);
+		FileSizes.push_back(resultSize);
 	}		// NOTE: IPs[i] corresponds to Filenames[i]
-	cout << "Found " << IPs.size() << " results. Type the number of the file you'd like to download.\n\n";
-	cout << "Number\t\tFilename\t\tIP\n";
+	cout << "Found " << IPs.size() << " results. Type the number of the file you'd like to download, or \"cancel\".\n\n";
+	cout << "Number\t\tFilename\t\tSize\t\tIP\n";
 	for(int i=0; i < IPs.size() && i < MAX_RESULTS_TO_SHOW ; i++) {  // displays results
 		cout << i+1 << "\t\t" << Filenames[i] << "\t\t" << IPs[i] << endl;
 	}
 	string fileToGetString; // read in which one they'd like to download
 	getline(cin,fileToGetString);
+	if(stripCaps(fileToGetString)=="cancel") return;
 	stringstream convertToInt;
 	convertToInt << fileToGetString;
 	int fileToGet;
@@ -76,7 +92,7 @@ int main(int argc, char* argv[]) {
 			cout << "Verbose mode initiated" << endl;
 		}
 	}
-	SHAREPATH = "./share/"; // initialize the sharing path to ./share/
+	getConfig();
 	syncWithTIA(); // Sync files in SHAREPATH with TIA server
 	if(!fork()) { // creates child process that listens for other clients needing a file
 		while(true) { // main accept loop

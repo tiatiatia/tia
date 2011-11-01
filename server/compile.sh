@@ -1,1 +1,1 @@
-g++ -o tiaserver tiaserver.cpp net.h tiautil.h
+g++ -o tiaserver tiaserver.cpp servernet.h tiautil.h
