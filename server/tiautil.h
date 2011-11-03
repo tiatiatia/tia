@@ -47,6 +47,26 @@ string stripCaps(string inputstr)
 	}
 	return inputstr;
 }
+bool clientAvailable(string clientIP)
+{
+// this takes a client IP address and checks connectedClients to see if the client
+// is available
+	//searchstr=clientIP
+	string filename="./connectedClients.txt";
+	fstream searchfile;
+	string ipAddr;
+	searchfile.open(filename.c_str(), ios_base::in);
+	while(getline(searchfile,ipAddr))
+	{
+		if ( clientIP.find(ipAddr) != string::npos)
+		{
+			searchfile.close();
+			return true;
+		}
+	}
+	searchfile.close();
+	return false;
+}
 string searchFiles(string searchstr, string clientIP)
 {
 // this takes a string and searches through every line of every file
@@ -71,7 +91,9 @@ string searchFiles(string searchstr, string clientIP)
 		getline(filelist,filename); //get rid of bacon herald message
 		while(getline(filelist,filename))
 		{ // search through each file
-			if(filename!=clientIP+".txt")
+			size_t pos = filename.find(".txt");
+			string ipName = filename.substr(0,pos);
+			if(filename!=clientIP+".txt"&&clientAvailable(ipName))
 			{
 				filename = "./Addresses/"+filename; // move directories
 				searchfile.open(filename.c_str(), ios_base::in);

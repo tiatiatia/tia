@@ -106,26 +106,33 @@ int main(int argc, char* argv[]) {
 	}
 	SHAREPATH = "./share/"; // initialize the sharing path to ./share/
 	syncWithTIA(); // Sync files in SHAREPATH with TIA server
-	if(!fork()) { // creates child process that listens for other clients needing a file
-		while(true) { // main accept loop
-			startServer(); // in net.h, sets up process as a server
-			acceptcon();
-			string fileRequested = getamsg();
-			sendafile(fileRequested);
-			bye();
+	for(int i=0; i<2; i++)
+	{
+		if(i==0){
+			if(!fork()) { // creates child process that listens for other clients needing a file
+				while(true) { // main accept loop
+					startServer(); // in net.h, sets up process as a server
+					acceptcon();
+					string fileRequested = getamsg();
+					sendafile(fileRequested);
+					bye();
+				}
+				exit(0);
+			}
 		}
-		exit(0);
-	}
-	if(!fork()) {
-		while(true) {
-			clock_t endwait;
-			int seconds = 5;
-			endwait=clock() + seconds*CLOCKS_PER_SEC;
-			while(clock()<endwait){}
-			imAlive();
-			bye();
+		else{
+			if(!fork()) {
+				while(true) {
+					clock_t endwait;
+					int seconds = 5;
+					endwait=clock() + seconds*CLOCKS_PER_SEC;
+					while(clock()<endwait){}
+					imAlive();
+					bye();
+				}
+				exit(0);
+			}
 		}
-		exit(0);
 	}
 	string input;
 	bool quit = false;
