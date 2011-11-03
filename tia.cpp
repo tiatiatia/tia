@@ -2,12 +2,14 @@
 
 #include <iostream>
 #include <vector>
-#include "tiautil.h"
 #include "net.h"
+#include "tiautil.h"
+#include "config.h"
 
 using namespace std;
 
-string SHAREPATH; // path to their local folder used for sharing
+extern string FOLDERNAME;// path to their local folder used for sharing
+extern string SERVERIP;
 int MAX_RESULTS_TO_SHOW = 15; // maximum number of query results to show the user
 
 /* sync() is called to send the server the client's
@@ -17,6 +19,7 @@ int syncWithTIA() {
 	string fileinfo = listShareInfo(); // find what's in SHAREPATH
 	sendamsg(fileinfo); // send file info to TIA server
 	bye(); // close the connection
+	cout << "Successfully connected to the TIA server.\n";
 	return 0;
 }
 
@@ -65,17 +68,21 @@ void request(string query) {
 			else resultName+=parsed[i];
 		}
 		i++;
-		for(i=0;i<parsed.size();i++) {
+		for(;i<parsed.size();i++) {
 			if(parsed[i]=='\t') break;
 			else resultSize+=parsed[i];
 		}
 		Filenames.push_back(resultName);
 		FileSizes.push_back(resultSize);
-	}		// NOTE: IPs[i] corresponds to Filenames[i]
+	}		// NOTE: IPs[i] corresponds to Filenames[i] and FileSizes[i]
+	if(IPs.size()==0) {
+		cout << "Sorry, no results found. Type in a new search query.\n";
+		return;
+	}
 	cout << "Found " << IPs.size() << " results. Type the number of the file you'd like to download, or \"cancel\".\n\n";
 	cout << "Number\t\tFilename\t\tSize\t\tIP\n";
 	for(int i=0; i < IPs.size() && i < MAX_RESULTS_TO_SHOW ; i++) {  // displays results
-		cout << i+1 << "\t\t" << Filenames[i] << "\t\t" << IPs[i] << endl;
+		cout << i+1 << "\t\t" << Filenames[i] << "\t\t" << FileSizes[i] << "\t\t" << IPs[i] << endl;
 	}
 	string fileToGetString; // read in which one they'd like to download
 	getline(cin,fileToGetString);
@@ -104,7 +111,7 @@ int main(int argc, char* argv[]) {
 			cout << "Verbose mode initiated" << endl;
 		}
 	}
-	SHAREPATH = "./share/"; // initialize the sharing path to ./share/
+	getConfig();
 	syncWithTIA(); // Sync files in SHAREPATH with TIA server
 	for(int i=0; i<2; i++)
 	{
@@ -136,9 +143,10 @@ int main(int argc, char* argv[]) {
 	}
 	string input;
 	bool quit = false;
-	cout << "Type a file name to search for it in the database. Type \"quit\" to exit." << endl;
 	while(!quit) {
-		if(input == "quit") {quit = true;disconnect();}
+		cout << "Type a file name to search for it in the database. Type \"quit\" to exit." << endl;
+		getline(cin, input);
+		if(input == "quit") quit = true;
 		else request(input);
 	}
 	return 0;
