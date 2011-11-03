@@ -11,9 +11,8 @@ getamsg() - get a message. Returns the message as a string
 sendamsg(string tosend) - send a message.
 Finally, call bye() to close sockets.
 *******************************************/
-
-
 #include <iostream>
+#include <string>
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
@@ -28,17 +27,13 @@ Finally, call bye() to close sockets.
 #include <sys/wait.h>
 #include <signal.h>
 //#include "tiautil.h"
+using namespace std;
 #define SERVERPORT "6969"
 #define CLIENTPORT "9696"
-//#define SERVERIP "140.103.108.219"  // spencer
-//#define SERVERIP "140.103.108.174"  // 3714
-//#define SERVERIP "140.103.108.226"	//trisha
-#define SERVERIP "140.103.37.76"	//killian
-#define FOLDERNAME "./share/"
-//#define SERVERIP "127.0.0.1"
+static string SERVERIP="140.103.108.219";  
+static string FOLDERNAME="./share/";
 #define BACKLOG 100
 
-using namespace std;
 
 bool VERBOSE = false;
 
@@ -57,6 +52,7 @@ char inmsg[4096];
 char *truaddr;
 
 void sigchld_handler(int s)
+// kills zombie child processes
 {
 	while(waitpid(-1, NULL, WNOHANG) > 0);
 }
@@ -68,7 +64,9 @@ void bye() // Things to handle when trying to exit
 	freeaddrinfo(res);
 }
 
-void makeTIAsocket(string ip) // Create the socket, refered to by sockfd. Pass a client's IP, or pass SERVERIP
+void makeTIAsocket(string ip) 
+// Create the socket, refered to by sockfd. Pass a client's IP, 
+// or pass SERVERIP
 {
 	newfd = -1;
 	memset(&hints, 0, sizeof hints);
@@ -86,7 +84,9 @@ void makeTIAsocket(string ip) // Create the socket, refered to by sockfd. Pass a
 	bye(); exit(1); }
 }
 
-void makeServerSocket() // Create the socket, refered to by sockfd. Used to listen for other client connections
+void makeServerSocket() 
+// Create the socket, refered to by sockfd. Used to listen for 
+//other client connections
 {
 	newfd = -1; // initialize newfd
 	memset(&hints, 0, sizeof hints);
@@ -109,7 +109,8 @@ void makeServerSocket() // Create the socket, refered to by sockfd. Used to list
 		exit(1); }
 }
 
-void connectto() // Open the connection
+void connectto() 
+// Open the connection
 {
 	if( ((struct sockaddr*)res->ai_addr)->sa_family==AF_INET)       // ip4
 	{       
@@ -136,12 +137,10 @@ void connectto() // Open the connection
 		inet_ntop(AF_INET, &(((struct sockaddr_in*)(&them))->sin_addr), ip4, INET_ADDRSTRLEN);
 		portnum = ntohs( ((struct sockaddr_in*)(&them))->sin_port );
 		if(VERBOSE) printf("Connected to %s:%d\n",ip4,portnum);
-		else printf("Connected to the TIA server.\n");
 	} else {
 		inet_ntop(AF_INET6, &(((struct sockaddr_in6*)(&them))->sin6_addr), ip6, INET6_ADDRSTRLEN);
 		portnum = ntohs( ((struct sockaddr_in6*)(&them))->sin6_port );
 		if(VERBOSE) printf("Connected to %s:%d\n",ip6,portnum);
-		else printf("Connected to the TIA server.\n");
 	}
 }
 
@@ -190,6 +189,7 @@ string getamsg()
 }
 
 void bindlisten()
+// binds the listening socket to the given port
 {
 	if((status=bind(sockfd, res->ai_addr, res->ai_addrlen))!=0) {
 		if(VERBOSE) fprintf(stderr, "Error binding: %s.\n", gai_strerror(errno));
@@ -199,10 +199,11 @@ void bindlisten()
 		if(VERBOSE) fprintf(stderr, "Error listening.\n");
 		else fprintf(stdin, "Sorry, could not start server.");
 	bye(); exit(1); }
-	printf("Server successfully started. Waiting for connections...\n");
+	if(VERBOSE) printf("Server successfully started. Waiting for connections...\n");
 }
 
 void acceptcon()
+// accepts a connection on the listening port
 {
 	newfd = accept(sockfd, (struct sockaddr*)&them, &((socklen_t)addr_size));
 	if(sockfd==-1) {
@@ -228,8 +229,6 @@ void sendamsg(string inputstring)
 	int len, bytes_sent;
 	const char* outmsg = inputstring.c_str();
 	len = strlen(outmsg);
-	cout << newfd << endl;
-	cout << sockfd << endl;
 	if(newfd==-1) // check if we're in server mode
 	bytes_sent=send(sockfd, outmsg, len, 0);
 	else bytes_sent=send(newfd, outmsg, len, 0);
@@ -240,6 +239,9 @@ void sendamsg(string inputstring)
 	if(VERBOSE) printf("Sent %d of %d bytes.\n", bytes_sent, len);
 }
 void getafile()
+// receives a file over the current connection. the first line of the
+// information received should be the file name, followed by the file size.
+// the preceding bytes are written to the filename specified by the received info
 {
 	stringstream heraldreader;
 	string herald = getamsg();
@@ -259,7 +261,6 @@ void getafile()
 		while (filesize > 0)
 		{
 			bytes_got = recv(sockfd, inmsg, sizeof inmsg, 0);
-			cout << "bytes_got: " << bytes_got << endl;
 			filesize -= bytes_got;
 			filewriter.write(inmsg, bytes_got);
 		}
@@ -272,6 +273,8 @@ void getafile()
 	}
 }
 void sendafile(string filename)
+// sends a file over the current connection. the name of the file is specified
+// in "filename"
 {
 	string trufilename = FOLDERNAME + filename;
 	fstream filereader;
@@ -295,23 +298,10 @@ void sendafile(string filename)
 		longconverter << filename << '\n' << filesize << '\n';
 		sendamsg(longconverter.str());
 		filereader.open(trufilename.c_str(), ios_base::in);
-		/*while (filesize > 0)
-		{
-			filereader.get(outmsg, sizeof outmsg, NULL);
-			bytes_read = filereader.gcount();
-			cout << "bytes_read: " << bytes_read << endl;
-			filesize -= bytes_read;
-			bytes_sent=send(sockfd, outmsg, bytes_read, 0);
-			if(bytes_sent==-1) {
-			if(VERBOSE) fprintf(stderr, "Error sending.\n");
-			bye(); exit(1); }
-			if(VERBOSE) printf("Sent %d of %d bytes.\n", bytes_sent, bytes_read);
-		}*/
 		while (filereader.good())
 		{
 			filereader.read(outmsg, sizeof outmsg);
 			bytes_read = filereader.gcount();
-			cout << "bytes_read: " << bytes_read << endl;
 			bytes_sent=send(newfd, outmsg, bytes_read, 0);
 			if(bytes_sent==-1) {
 			if(VERBOSE) fprintf(stderr, "Error sending.\n");

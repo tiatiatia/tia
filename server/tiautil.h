@@ -1,3 +1,7 @@
+/* Tiautil
+* This is a collection of miscellaneous string/file-io related functions
+* that are used in both TIA client and TIA server
+*/
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -5,12 +9,11 @@
 #include <dirent.h>
 using namespace std;
 
-extern bool VERBOSE;
+extern bool VERBOSE; //indicates whether the user is in verbose mode
 
 string listdir(const char *path) {
 // Takes in a directory name and returns
 // a list of file names separated by newline characters
-// used in the client program to get a list of file names to send to the server
 // used in the server to search through its IP databases
   stringstream filelist;
   struct dirent *entry;
@@ -21,7 +24,6 @@ string listdir(const char *path) {
     return NULL;
   }
   if (VERBOSE) cout << "reading filenames in directory " << path << "...";
-  filelist << "bacon\n";
   while((entry = readdir(dp)))
   { // read all files in directory
     filelist << entry->d_name;
@@ -30,7 +32,7 @@ string listdir(const char *path) {
   closedir(dp);
   string output = filelist.str();
   // here we remove the troublesome dot and double dot file names
-  while ((output[6] == '\n') || (output[6] == '.')) output.erase(output.begin()+6);
+  while ((output[0] == '\n') || (output[0] == '.')) output.erase(output.begin());
   return output;
 }
 string stripCaps(string inputstr)
@@ -68,10 +70,10 @@ string searchFiles(string searchstr, string clientIP)
 	try
 	{
 		if (VERBOSE) cout << "Searching database for \"" << searchstr << "\"..."<< endl;
-		getline(filelist,filename); //get rid of bacon herald message
+		//getline(filelist,filename); //get rid of bacon herald message
 		while(getline(filelist,filename))
 		{ // search through each file
-			if(filename!=clientIP+".txt")
+			if(filename!=clientIP+".txt" && filename.size() > 4)
 			{
 				filename = "./Addresses/"+filename; // move directories
 				searchfile.open(filename.c_str(), ios_base::in);
@@ -79,8 +81,15 @@ string searchFiles(string searchstr, string clientIP)
 				filename.erase(filename.end() - 4,filename.end());
 				while (getline(searchfile,listing))
 				{// search through each line
-					listing = stripCaps(listing); 
-					if ( listing.find(searchstr.c_str()) != string::npos)
+					string namelisting = ""; // "listing" has name, size, and hash
+					for(int i=0;i<listing.size();i++) // we only need the name
+					{
+						if(listing[i]=='\t') // once a tab is encountered, we have the name
+							break;
+						else namelisting+=listing[i];
+					}
+					namelisting = stripCaps(namelisting); 
+					if ( namelisting.find(searchstr.c_str()) != string::npos)
 					{ // found a match
 					if (VERBOSE) cout << "Found match at "<< filename << "in file " << listing << endl;
 						searchresults+=filename + '\n' + 
