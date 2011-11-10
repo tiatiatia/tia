@@ -17,11 +17,11 @@ int communicate() {
 	startServer();
 	
 	while(1) {
-		acceptcon();
 		
 		for(int i=0; i<2; i++)
 		{
-			if(i==0){
+			if(i==1){
+				acceptcon();
 				if(!fork()) {
 					close(sockfd); // child process doesn't need the original socket
 					string message = getamsg();
@@ -59,6 +59,7 @@ int communicate() {
 			else{
 				if(!fork()) {
 					while(true) {
+						cout << "Removing clients in 60 seconds..." << endl;
 						clock_t endwait;
 						int seconds = 60;
 						endwait = clock()+seconds*CLOCKS_PER_SEC;

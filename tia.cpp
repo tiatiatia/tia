@@ -135,7 +135,6 @@ int main(int argc, char* argv[]) {
 					endwait=clock() + seconds*CLOCKS_PER_SEC;
 					while(clock()<endwait){}
 					imAlive();
-					bye();
 				}
 				exit(0);
 			}
