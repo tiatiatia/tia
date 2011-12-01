@@ -32,6 +32,14 @@ void getFromClient(string ip, string filetoget)
 	bye();
 }
 
+void imAlive(void)
+{
+	string serverQuery="alive";
+	connectToTIA();
+	sendamsg(serverQuery);
+	bye();
+}
+
 /* request() is a function that takes in a user entered
 string, sends "cheese" (sentinal value indicating a request)
 followed by the query to the TIA server, and receives the results.
@@ -86,6 +94,12 @@ void request(string query) {
 	cout << "Attempting to get the file " << Filenames[fileToGet-1] << " from " << IPs[fileToGet-1] << endl;
 	getFromClient(IPs[fileToGet-1], Filenames[fileToGet-1]);
 }
+void disconnect() {
+	string serverQuery = "later";	//quit signal
+	connectToTIA();	// open server connection
+	sendamsg(serverQuery);	//send query
+	bye();
+}
  
 int main(int argc, char* argv[]) {
 	VERBOSE = false;
@@ -99,19 +113,37 @@ int main(int argc, char* argv[]) {
 	}
 	getConfig();
 	syncWithTIA(); // Sync files in SHAREPATH with TIA server
-	if(!fork()) { // creates child process that listens for other clients needing a file
-		while(true) { // main accept loop;
-			startServer(); // in net.h, sets up process as a server
-			acceptcon();
-			string fileRequested = getamsg();
-			if(fileRequested == "Ok you should probably die right now. Thank you very much.") {
-	bye();
-	exit(0);
-}
-			sendafile(fileRequested);
-			bye();
+
+	for(int i=0; i<2; i++)
+	{
+		if(i==0){
+			if(!fork()) { // creates child process that listens for other clients needing a file
+				while(true) { // main accept loop
+					startServer(); // in net.h, sets up process as a server
+					acceptcon();
+					string fileRequested = getamsg();
+					if(fileRequested == "Ok you should probably die right now. Thank you very much.") {
+					        bye();
+				        	exit(0);
+					}
+					sendafile(fileRequested);
+					bye();
+				}
+				exit(0);
+			}
 		}
-		exit(0);
+		else{
+			if(!fork()) {
+				while(true) {
+					clock_t endwait;
+					int seconds = 5;
+					endwait=clock() + seconds*CLOCKS_PER_SEC;
+					while(clock()<endwait){}
+					imAlive();
+				}
+				exit(0);
+			}
+		}
 	}
 	string input;
 	bool quit = false;

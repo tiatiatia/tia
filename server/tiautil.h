@@ -49,6 +49,26 @@ string stripCaps(string inputstr)
 	}
 	return inputstr;
 }
+bool clientAvailable(string clientIP)
+{
+// this takes a client IP address and checks connectedClients to see if the client
+// is available
+	//searchstr=clientIP
+	string filename="./connectedClients.txt";
+	fstream searchfile;
+	string ipAddr;
+	searchfile.open(filename.c_str(), ios_base::in);
+	while(getline(searchfile,ipAddr))
+	{
+		if ( clientIP.find(ipAddr) != string::npos)
+		{
+			searchfile.close();
+			return true;
+		}
+	}
+	searchfile.close();
+	return false;
+}
 string searchFiles(string searchstr, string clientIP)
 {
 // this takes a string and searches through every line of every file
@@ -73,7 +93,9 @@ string searchFiles(string searchstr, string clientIP)
 		//getline(filelist,filename); //get rid of bacon herald message
 		while(getline(filelist,filename))
 		{ // search through each file
-			if(filename!=clientIP+".txt" && filename.size() > 4)
+			size_t pos = filename.find(".txt");
+			string ipName = filename.substr(0,pos);
+			if(filename!=clientIP+".txt" && filename.size() > 4 && clientAvailable(ipName))
 			{
 				filename = "./Addresses/"+filename; // move directories
 				searchfile.open(filename.c_str(), ios_base::in);
@@ -125,4 +147,47 @@ void writeString(string content, string name){
 		{
 			cerr << "File operation on file" << name <<" failed: " << e.what() << endl;
 		}
+}
+
+void addString(string content, string name){
+// This function appends a string to a file
+// used by server to add connected IP addresses
+	fstream filewriter;
+	name = name + ".txt";
+	try
+	{
+		if (VERBOSE) cout << "Adding to file " << name << "..." << endl;
+		filewriter.open(name.c_str(), ios_base::in | ios_base::out | ios_base::ate);
+		filewriter << content;
+		filewriter.close();
+	}
+	catch(exception e)
+	{
+		cerr << "File operation on file" << name <<" failed: " << e.what() << endl;
+	}
+}
+
+void removeString(string content, string name){
+// This function takes a string and removes it from a file of the given name
+// used by server to remove connected IP addresses
+	string origName=name;
+	name = name + ".txt";
+	try
+	{
+		if (VERBOSE) cout << "Removing from file " << name << "..." << endl;
+		ifstream fin(name.c_str());
+		string fileContents,temp;
+		while(fin>>temp)
+		{
+			if(temp==content)
+			{}
+			else
+				fileContents+=temp+"\n";
+		}
+		writeString(fileContents, origName);
+	}
+	catch(exception e)
+	{
+		cerr << "File operation on file" << name <<" failed: " << e.what() << endl;
+	}
 }

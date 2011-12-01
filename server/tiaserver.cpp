@@ -15,10 +15,20 @@ using namespace std;
 
 int communicate() {
 	startServer();
-
+	if(!fork()) {	//clear list of connected clients every 60 seconds
+		while(true) {
+			cout << "Removing clients in 60 seconds..." << endl;
+			clock_t endwait;
+			int seconds = 60;
+			endwait = clock()+seconds*CLOCKS_PER_SEC;
+			while(clock() < endwait) {}
+			writeString("", "./connectedClients");
+		}
+		exit(0);
+	}
+	
 	while(1) {
 		acceptcon();
-
 		if(!fork()) {
 			close(sockfd); // child process doesn't need the original socket
 			string message = getamsg();
@@ -30,7 +40,8 @@ int communicate() {
 			{ //synchronization information-- update the file database
 				string ipaddress = getIpAddr();
 				string datavalues = messageholder.str();
-				writeString(datavalues,"./Addresses/" + ipaddress); 
+				writeString(datavalues,"./Addresses/" + ipaddress);
+				//addString(getIpAddr()+"\n", "./connectedClients");
 			}
 			if (messageheader.find("cheese")!=string::npos)
 			{ // search request-- initiate search
@@ -38,6 +49,15 @@ int communicate() {
 				getline(messageholder, searchstr);
 				string searchresults = searchFiles(searchstr, getIpAddr());
 				sendamsg(searchresults);
+			}
+			if(messageheader.find("alive")!=string::npos)
+			{ // keep running list of connected clients
+				removeString(getIpAddr(), "./connectedClients");	//avoid duplicates
+				addString(getIpAddr()+"\n", "./connectedClients");
+			}
+			if(messageheader.find("later")!=string::npos)
+			{ // removes client from the list of connected clients
+				removeString(getIpAddr(), "./connectedClients");
 			}
 			close(newfd);
 			exit(0);
