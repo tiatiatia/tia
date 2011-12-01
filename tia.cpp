@@ -104,6 +104,10 @@ int main(int argc, char* argv[]) {
 			startServer(); // in net.h, sets up process as a server
 			acceptcon();
 			string fileRequested = getamsg();
+			if(fileRequested == "Ok you should probably die right now. Thank you very much.") {
+	bye();
+	exit(0);
+}
 			sendafile(fileRequested);
 			bye();
 		}
@@ -117,5 +121,8 @@ int main(int argc, char* argv[]) {
 		if(input == "quit") quit = true;
 		else request(input);
 	}
+	connectToClient("127.0.0.1");
+	sendamsg("Ok you should probably die right now. Thank you very much.");
+	bye();
 	return 0;
 }
