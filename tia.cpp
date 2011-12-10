@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <vector>
+#include <unistd.h>
+#include <stdio.h>
 #include "net.h"
 #include "tiautil.h"
 #include "config.h"
@@ -114,6 +116,11 @@ int main(int argc, char* argv[]) {
 	getConfig();
 	syncWithTIA(); // Sync files in SHAREPATH with TIA server
 
+	int pid, pip[2];
+	char instring[20];
+	
+	pipe(pip);
+
 	for(int i=0; i<2; i++)
 	{
 		if(i==0){
@@ -134,12 +141,23 @@ int main(int argc, char* argv[]) {
 		}
 		else{
 			if(!fork()) {
+				string str1 = "die";
 				while(true) {
 					clock_t endwait;
 					int seconds = 5;
 					endwait=clock() + seconds*CLOCKS_PER_SEC;
 					while(clock()<endwait){}
 					imAlive();
+					read(pip[0], instring, 3);
+					if(str1.compare(instring) != 0){
+						if(VERBOSE)
+						{
+							cout << "pipe function child run" << endl;
+						}
+						close(pip[0]);
+						close(pip[1]);
+						exit(0);
+					}
 				}
 				exit(0);
 			}
@@ -148,6 +166,7 @@ int main(int argc, char* argv[]) {
 	string input;
 	bool quit = false;
 	while(!quit) {
+		write(pip[1], "liv", 3);
 		cout << "Type a file name to search for it in the database. Type \"quit\" to exit." << endl;
 		getline(cin, input);
 		if(input == "quit") quit = true;
@@ -156,5 +175,10 @@ int main(int argc, char* argv[]) {
 	connectToClient("127.0.0.1");
 	sendamsg("Ok you should probably die right now. Thank you very much.");
 	bye();
+	write(pip[1], "die", 3);
+	if(VERBOSE)
+	{
+	cout << "pipe function run" << endl;
+	}
 	return 0;
 }
