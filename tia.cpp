@@ -149,7 +149,7 @@ int main(int argc, char* argv[]) {
 					while(clock()<endwait){}
 					imAlive();
 					read(pip[0], instring, 3);
-					if(str1.compare(instring) != 0){
+					if(str1.compare(instring) == 0){
 						if(VERBOSE)
 						{
 							cout << "pipe function child run" << endl;
